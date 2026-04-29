@@ -1,0 +1,536 @@
+.card {
+    padding: var(--sp-6);
+    margin-bottom: var(--sp-6);
+    position: relative;
+    border-radius: var(--radius);
+    background: var(--bg-card);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--sp-6);
+}
+
+.userInfo {
+    display: flex;
+    gap: var(--sp-4);
+    align-items: center;
+}
+
+.avatarWrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--grad);
+    padding: 2px;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: block;
+    background: var(--bg-dark);
+}
+
+.userMeta {
+    display: flex;
+    flex-direction: column;
+}
+
+.anonName {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin: 0;
+}
+
+.time {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dim);
+}
+
+.moodTag {
+    padding: 0.3rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+}
+
+.text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: var(--sp-6);
+    color: var(--text);
+    white-space: pre-wrap;
+}
+
+/* Poll Styles */
+.poll {
+    background: rgba(0, 0, 0, 0.2);
+    padding: var(--sp-4);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--sp-6);
+    border: 1px solid var(--border);
+}
+
+.pollQuestion {
+    font-weight: 700;
+    margin-bottom: var(--sp-4);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.pollGrid {
+    display: grid;
+    gap: var(--sp-2);
+}
+
+.pollOption {
+    position: relative;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pollBg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: rgba(131, 58, 180, 0.1);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+}
+
+.optText,
+.optPercent {
+    position: relative;
+    z-index: 1;
+}
+
+.voted .pollBg {
+    background: rgba(131, 58, 180, 0.2);
+}
+
+/* Footer Interaction */
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--border);
+}
+
+.engagement {
+    display: flex;
+    gap: var(--sp-6);
+    align-items: center;
+}
+
+.reactionContainer {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+.miniReact {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.miniReact:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: scale(1.05);
+}
+
+.miniCount {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-dim);
+}
+
+.activeReact {
+    background: rgba(131, 58, 180, 0.1);
+    border-color: var(--primary);
+}
+
+.pickerWrapper {
+    position: relative;
+}
+
+.addReact {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    transition: var(--transition);
+}
+
+.addReact:hover {
+    color: var(--primary);
+    transform: scale(1.1);
+}
+
+.pickerPopup {
+    position: absolute;
+    bottom: 150%;
+    left: 0;
+    display: flex;
+    gap: var(--sp-2);
+    padding: var(--sp-2);
+    border-radius: 30px;
+    animation: modalAppear 0.2s var(--transition);
+    z-index: 10;
+}
+
+.pickerEmoji {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: var(--sp-1);
+    transition: var(--transition);
+}
+
+.pickerEmoji:hover {
+    transform: scale(1.4);
+}
+
+.commentToggle {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    color: var(--text-dim);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.commentToggle:hover {
+    color: var(--primary);
+}
+
+.statCount {
+    font-size: 0.85rem;
+}
+
+.actions {
+    display: flex;
+    gap: var(--sp-2);
+}
+
+.actionBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: var(--sp-2);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.privateBadge {
+    padding: 4px 12px;
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: var(--sp-2);
+}
+
+.actionBtn:hover {
+    background: rgba(131, 58, 180, 0.1);
+    color: var(--primary);
+}
+
+.bookmarked {
+    color: var(--accent);
+}
+
+.commentSection {
+    margin-top: var(--sp-6);
+    animation: fadeIn 0.3s ease;
+}
+
+/* Edit Mode */
+.editArea {
+    width: 100%;
+    margin-bottom: var(--sp-6);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius-sm);
+    padding: var(--sp-4);
+    color: var(--text);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(131, 58, 180, 0.05);
+}
+
+/* Action Buttons */
+.cardAction {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: var(--sp-2);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cardAction:hover {
+    background: rgba(131, 58, 180, 0.1);
+    color: var(--primary);
+}
+
+.deleteBtn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+/* Prompt Overlay */
+.promptOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    border-radius: var(--radius);
+    padding: var(--sp-6);
+}
+
+.promptBox {
+    width: 100%;
+    max-width: 320px;
+    padding: var(--sp-6);
+    border-radius: var(--radius);
+    text-align: center;
+    background: #0f172a;
+    border: 1px solid var(--border-glow);
+    box-shadow: var(--shadow-xl);
+}
+
+.promptBox h4 {
+    margin-bottom: var(--sp-2);
+    font-weight: 800;
+}
+
+.promptBox p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: var(--sp-6);
+}
+
+.promptInput {
+    width: 100%;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 1rem;
+    color: var(--text);
+    text-align: center;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    margin-bottom: var(--sp-6);
+}
+
+.promptInput:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.promptActions {
+    display: flex;
+    gap: var(--sp-3);
+    justify-content: center;
+}
+
+.userBadge {
+    background: var(--primary);
+    color: white;
+    font-size: 0.6rem;
+    padding: 1px 5px;
+    border-radius: 10px;
+    font-weight: 800;
+    margin-left: 2px;
+}
+
+.maxed {
+    opacity: 0.8;
+    background: rgba(131, 58, 180, 0.2);
+    cursor: default;
+}
+
+/* Reply & Highlight Styles */
+.replyBox {
+    margin-top: var(--sp-4);
+    background: rgba(99, 102, 241, 0.05);
+    border-left: 3px solid var(--primary);
+    padding: var(--sp-4);
+    border-radius: 0 12px 12px 0;
+    margin-bottom: var(--sp-6);
+    animation: fadeIn 0.3s ease;
+}
+
+.replyHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.replyText {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text);
+    margin: 0;
+}
+
+.replyForm {
+    margin-top: var(--sp-4);
+    margin-bottom: var(--sp-6);
+}
+
+.replyArea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1rem;
+    resize: none;
+    outline: none;
+    transition: all 0.3s;
+    margin-bottom: 0.5rem;
+}
+
+.replyArea:focus {
+    border-color: var(--primary);
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0 2px rgba(131, 58, 180, 0.1);
+}
+
+.replyActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.repliedCard {
+    border: 1px solid rgba(99, 102, 241, 0.3) !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(2, 6, 23, 0.4) 100%) !important;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+.replyBtn:hover {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+}
+
+/* ─── Inbox Action Bar ─── */
+.inboxActions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+}
+
+.inboxBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.replyInboxBtn {
+    background: rgba(99, 102, 241, 0.12);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: var(--primary);
+}
+
+.replyInboxBtn:hover {
+    background: rgba(99, 102, 241, 0.22);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.deleteInboxBtn {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #ef4444;
+}
+
+.deleteInboxBtn:hover {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: #ef4444;
+    transform: translateY(-1px);
+}
+
+.deleteInboxBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.repliedBadge {
+    font-size: 0.8rem;
+    color: #10b981;
+    font-weight: 600;
+}

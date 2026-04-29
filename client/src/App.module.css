@@ -1,0 +1,152 @@
+.app {
+    min-height: 100vh;
+}
+
+.main {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* Hero */
+.hero {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.heroTitle {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    letter-spacing: -0.03em;
+}
+
+.heroParagraph {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .main {
+        grid-template-columns: 240px 1fr;
+    }
+
+    .trendingSection {
+        display: none;
+    }
+}
+
+@media (max-width: 800px) {
+    .main {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebarSection {
+        display: none;
+    }
+}
+
+/* Stats */
+.stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+}
+
+.statNum {
+    font-size: 1.6rem;
+    font-weight: 800;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.statLabel {
+    font-size: .78rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+/* Login prompt */
+.loginPrompt {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.loginEmoji {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: .75rem;
+}
+
+.loginPrompt h3 {
+    font-size: 1.2rem;
+    margin-bottom: .4rem;
+}
+
+.loginPrompt p {
+    color: var(--text-muted);
+    font-size: .9rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+}
+
+/* Inbox Header */
+.inboxHeader {
+    padding: 1.5rem 0 0.5rem;
+}
+
+.inboxHeader h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+}
+
+.inboxHeader p {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+}
+
+.visitStat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    padding: 0.4rem 0.9rem;
+    border-radius: 99px;
+}
+
+.visitStat strong {
+    color: var(--primary);
+    font-weight: 700;
+}

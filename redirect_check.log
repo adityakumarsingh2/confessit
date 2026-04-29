@@ -1,0 +1,2 @@
+Location: https://accounts.google.com/o/oauth2/v2/auth?response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fauth%2Fgoogle%2Fcallback&scope=profile%20email&client_id=536150336514-e3t6l0b3ef8f60r6tr4ier6u10ju3l59.apps.googleusercontent.com
+Code: 302
