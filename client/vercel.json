@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://confessit-pr9r.onrender.com/api/$1"
+    },
+    {
+      "source": "/auth/(.*)",
+      "destination": "https://confessit-pr9r.onrender.com/auth/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
