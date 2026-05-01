@@ -8,6 +8,7 @@ import ConfessionForm from './components/ConfessionForm';
 import ConfessionList from './components/ConfessionList';
 import PublicProfile from './components/PublicProfile';
 import Toast from './components/Toast';
+import LandingPage from './components/LandingPage';
 import styles from './App.module.css';
 
 let toastId = 0;
@@ -136,9 +137,10 @@ export default function App() {
     };
 
     const handleBookmark = async (id) => {
+        const isCurrentlyBookmarked = activity?.bookmarks?.some(b => (b._id || b) === id);
         try {
             await toggleBookmark(id);
-            addToast('Saved to bookmarks 🔖');
+            addToast(isCurrentlyBookmarked ? 'Removed from bookmarks' : 'Saved to bookmarks 🔖', isCurrentlyBookmarked ? 'default' : 'success');
         } catch (e) {
             addToast(e.message, 'error');
         }
@@ -154,20 +156,20 @@ export default function App() {
         }
     };
 
-    const handleDelete = async (id, secretCode) => {
+    const handleDelete = async (id) => {
         try {
-            await deleteConfession(id, secretCode);
-            addToast('Confession deleted! 🗑️', 'success');
+            await deleteConfession(id);
+            addToast('Confession deleted', 'success');
         } catch (e) {
             addToast(e.message, 'error');
-            throw e; // Propagate for UI handling
+            throw e;
         }
     };
 
     const handlePostComment = async (confid, text) => {
         try {
             await postComment(confid, text);
-            addToast('Comment posted! 💬');
+            addToast('Comment posted! 💬', 'success');
         } catch (e) {
             addToast(e.message, 'error');
         }
@@ -191,57 +193,11 @@ export default function App() {
                 onNavigate={setCurrentView}
             />
 
-            <main className={styles.main}>
-                {/* Hero - Only show for guests */}
-                {!user && (
-                    <div className={styles.hero}>
-                        <div className={styles.heroBackground}>
-                            <div className={`${styles.orb} ${styles.orb1}`}></div>
-                            <div className={`${styles.orb} ${styles.orb2}`}></div>
-                            <div className={`${styles.orb} ${styles.orb3}`}></div>
-                        </div>
-                        
-                        <div className={styles.heroContent}>
-                            <div className={styles.badgeWrapper}>
-                                <span className={styles.heroBadge}><Sparkles size={14} style={{display:'inline-block', verticalAlign:'middle', marginRight:'6px'}} /> The #1 Anonymous Confessions Platform</span>
-                            </div>
-                            <h1 className={styles.heroTitle}>
-                                Speak your truth, <br/>
-                                <span className="grad-text">Stay Anonymous.</span>
-                            </h1>
-                            <p className={styles.heroParagraph}>
-                                Join a safe space to share your deepest thoughts, secrets, and stories without fear of judgment. Everyone is listening, but no one knows who you are.
-                            </p>
-                            
-                            <div className={styles.heroCta}>
-                                <a href={`${import.meta.env.VITE_API_URL || ''}/auth/google`} className={`btn btn-primary ${styles.ctaButton}`}>
-                                    Start Confessing Now
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                </a>
-                            </div>
-
-                            <div className={styles.featureCards}>
-                                <div className={`glass ${styles.featureCard}`}>
-                                    <div className={styles.featureIcon}><ShieldCheck size={26} color="var(--primary)" /></div>
-                                    <h3>100% Anonymous</h3>
-                                    <p>Your real identity is never stored, shared, or exposed. Speak freely.</p>
-                                </div>
-                                <div className={`glass ${styles.featureCard}`}>
-                                    <div className={styles.featureIcon}><Globe size={26} color="var(--primary)" /></div>
-                                    <h3>Global Community</h3>
-                                    <p>Connect with millions of users sharing their authentic selves.</p>
-                                </div>
-                                <div className={`glass ${styles.featureCard}`}>
-                                    <div className={styles.featureIcon}><MessageCircleHeart size={26} color="var(--primary)" /></div>
-                                    <h3>Zero Judgment</h3>
-                                    <p>A safe, supportive environment where your voice truly matters.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Left Section */}
+            {!user && currentView === 'feed' && !sharedConfession ? (
+                <LandingPage confessions={confessions} />
+            ) : (
+                <main className={styles.main}>
+                    {/* Left Section */}
                 <div className={styles.sidebarSection}>
                     <Sidebar
                         user={user}
@@ -315,6 +271,7 @@ export default function App() {
                     <TrendingBar trendingPosts={confessions} />
                 </div>
             </main>
+            )}
 
             {/* Toasts */}
             <Toast toasts={toasts} remove={removeToast} />

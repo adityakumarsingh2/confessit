@@ -11,7 +11,6 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
     const [allowComments, setAllowComments] = useState(true);
     const [pollEnabled, setPollEnabled] = useState(false);
     const [pollOptions, setPollOptions] = useState(['', '']);
-    const [secretCode, setSecretCode] = useState('');
     const [busy, setBusy] = useState(false);
     const textareaRef = useRef(null);
 
@@ -37,7 +36,6 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
             mood,
             isAnonymous,
             allowComments,
-            secretCode: secretCode.trim()
         };
 
         if (pollEnabled) {
@@ -50,11 +48,9 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
         try {
             await onSubmit(payload);
             setText('');
-            setSecretCode('');
             setPollEnabled(false);
             setPollOptions(['', '']);
         } catch (err) {
-            // onSubmit (handlePost in App.jsx) already fires addToast for errors
             console.error('Post failed:', err.message);
         } finally {
             setBusy(false);
@@ -79,17 +75,6 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
                             {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
                         </select>
                     </div>
-                </div>
-                <div className={styles.secretBox}>
-                    <input
-                        type="password"
-                        placeholder="Secret Code"
-                        value={secretCode}
-                        onChange={(e) => setSecretCode(e.target.value)}
-                        className={styles.secretInput}
-                        required
-                        minLength={4}
-                    />
                 </div>
             </div>
 
@@ -163,19 +148,16 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
                         type="button"
                         onClick={async () => {
                             if (!text.trim()) return;
-                            try {
-                                await onSaveDraft({ text, mood });
-                            } catch (err) {
-                                console.error('Draft save failed:', err.message);
-                            }
+                            try { await onSaveDraft({ text, mood }); }
+                            catch (err) { console.error('Draft save failed:', err.message); }
                         }}
                         className="btn btn-ghost"
                         disabled={!text.trim()}
                     >
                         Save Draft
                     </button>
-                    <button className="btn btn-primary" type="submit" disabled={busy || text.trim().length < 5 || secretCode.trim().length < 4}>
-                        {busy ? 'Spilling...' : 'Post Secret 🚀'}
+                    <button className="btn btn-primary" type="submit" disabled={busy || text.trim().length < 5}>
+                        {busy ? 'Posting...' : 'Post Secret 🚀'}
                     </button>
                 </div>
             </div>

@@ -155,12 +155,11 @@ export function useConfessions() {
         await fetchConfessions({}, true);
     };
 
-    const deleteConfession = async (id, secretCode) => {
+    const deleteConfession = async (id) => {
         const res = await fetch(`${API}/confessions/${id}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ secretCode }),
         });
         if (!res.ok) {
             const err = await res.json();

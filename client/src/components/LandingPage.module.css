@@ -1,0 +1,326 @@
+/* ── Split Screen Layout ── */
+.landingContainer {
+    min-height: calc(100vh - 80px); /* minus navbar */
+    display: flex;
+    overflow: hidden;
+    background: #020617; /* Slate 950 base */
+}
+
+.splitLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ── Left Side: Marketing / CTA ── */
+.leftPanel {
+    padding: 4rem 4rem 4rem 6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    background: radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.05), transparent 50%);
+}
+
+.heroBackground {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.2;
+    animation: float 15s infinite ease-in-out alternate;
+    will-change: transform;
+}
+
+.orb1 {
+    width: 400px;
+    height: 400px;
+    background: #38bdf8;
+    top: -100px;
+    left: -100px;
+    animation-delay: 0s;
+}
+
+.orb2 {
+    width: 300px;
+    height: 300px;
+    background: #818cf8;
+    bottom: 10%;
+    left: 20%;
+    animation-delay: -5s;
+}
+
+.badgeWrapper {
+    margin-bottom: 1.5rem;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.heroBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.heroTitle {
+    font-size: clamp(3.5rem, 5vw, 5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    animation: slideUp 1s ease-out;
+}
+
+.highlight {
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    background-image: linear-gradient(90deg, #38bdf8, #818cf8);
+}
+
+.heroParagraph {
+    color: var(--text-dim);
+    font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+    line-height: 1.7;
+    max-width: 500px;
+    margin-bottom: 3rem;
+    animation: slideUp 1.2s ease-out;
+}
+
+.heroCta {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    animation: slideUp 1.4s ease-out;
+}
+
+.ctaButton {
+    padding: 1rem 2.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #fff;
+    color: #020617;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.ctaButton:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.secondaryCta {
+    padding: 1rem 2rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.secondaryCta:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+}
+
+/* ── Features List (Under CTA) ── */
+.featureList {
+    margin-top: 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: slideUp 1.6s ease-out;
+}
+
+.featureItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.featureIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(56, 189, 248, 0.1);
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.featureText {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text);
+}
+.featureSub {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    display: block;
+    margin-top: 0.2rem;
+}
+
+/* ── Right Side: Live Feed ── */
+.rightPanel {
+    position: relative;
+    height: calc(100vh - 80px);
+    background: #0f172a; /* Slate 900 */
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+}
+
+.feedTrack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 500px;
+    animation: scrollVertical 60s linear infinite;
+}
+
+.feedTrack:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scrollVertical {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(calc(-50% - 0.75rem)); }
+}
+
+/* Confession Card Mockup */
+.feedCard {
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease;
+}
+
+.feedCard:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-2px);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.cardAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1e293b;
+}
+
+.cardName {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+.cardTime {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+.cardText {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text);
+}
+
+/* Overlay Gradients to smooth out the scrolling top and bottom */
+.topOverlay, .bottomOverlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 150px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.topOverlay {
+    top: 0;
+    background: linear-gradient(to bottom, #0f172a, transparent);
+}
+
+.bottomOverlay {
+    bottom: 0;
+    height: 250px;
+    background: linear-gradient(to top, #0f172a 20%, transparent);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 3rem;
+    pointer-events: auto; /* Allow clicking the button inside */
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+    .splitLayout {
+        grid-template-columns: 1fr;
+    }
+    
+    .leftPanel {
+        padding: 4rem 1.5rem;
+        text-align: center;
+        align-items: center;
+    }
+    
+    .heroParagraph {
+        margin: 0 auto 3rem;
+    }
+
+    .featureList {
+        display: none; /* Hide features on mobile to save space */
+    }
+
+    .rightPanel {
+        height: 50vh;
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .ctaButton {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .heroCta {
+        flex-direction: column;
+        width: 100%;
+    }
+}

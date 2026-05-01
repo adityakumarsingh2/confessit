@@ -56,12 +56,7 @@ const ConfessionSchema = new mongoose.Schema({
         ref: 'User',
         default: null
     },
-    secretCode: {
-        type: String,
-        required: function () { return !this.recipientId; }, // Optional for guest private messages
-        minLength: 4,
-        select: false
-    },
+
     isRead: {
         type: Boolean,
         default: false

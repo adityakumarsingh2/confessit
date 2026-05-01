@@ -338,14 +338,8 @@ app.get('/share/:id', async (req, res) => {
 
 // POST /api/confessions
 app.post('/api/confessions', isAuth, async (req, res) => {
-    const { text, mood, isAnonymous, allowComments, poll, secretCode } = req.body;
-
-    if (!secretCode || secretCode.length < 4) {
-        return res.status(400).json({ message: 'Secret code must be at least 4 characters long' });
-    }
-
+    const { text, mood, isAnonymous, allowComments, poll } = req.body;
     try {
-        const hashedCode = await bcrypt.hash(secretCode, 10);
         const confession = new Confession({
             text,
             mood,
@@ -354,10 +348,8 @@ app.post('/api/confessions', isAuth, async (req, res) => {
             poll,
             userId: req.user._id,
             anonName: req.user.anonName,
-            anonAvatar: req.user.anonAvatar,
-            secretCode: hashedCode
+            anonAvatar: req.user.anonAvatar
         });
-
         const newConfession = await confession.save();
         res.status(201).json(newConfession);
     } catch (err) {
@@ -394,17 +386,14 @@ app.post('/api/confessions/:id/react', isAuth, async (req, res) => {
 
 // PUT /api/confessions/:id
 app.put('/api/confessions/:id', isAuth, async (req, res) => {
-    const { text, mood, secretCode } = req.body;
+    const { text, mood } = req.body;
     try {
-        const confession = await Confession.findById(req.params.id).select('+secretCode');
+        const confession = await Confession.findById(req.params.id);
         if (!confession) return res.status(404).json({ message: 'Confession not found' });
 
         if (confession.userId.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized' });
         }
-
-        const isMatch = await bcrypt.compare(secretCode, confession.secretCode);
-        if (!isMatch) return res.status(401).json({ message: 'Incorrect secret code' });
 
         confession.text = text || confession.text;
         confession.mood = mood || confession.mood;
@@ -417,9 +406,8 @@ app.put('/api/confessions/:id', isAuth, async (req, res) => {
 
 // DELETE /api/confessions/:id
 app.delete('/api/confessions/:id', isAuth, async (req, res) => {
-    const { secretCode } = req.body;
     try {
-        const confession = await Confession.findById(req.params.id).select('+secretCode');
+        const confession = await Confession.findById(req.params.id);
         if (!confession) return res.status(404).json({ message: 'Confession not found' });
 
         const isOwner = confession.userId && confession.userId.toString() === req.user._id.toString();
@@ -429,16 +417,7 @@ app.delete('/api/confessions/:id', isAuth, async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to delete' });
         }
 
-        // Recipients don't need a secret code; Owners do (unless it's a private message without a code?)
-        // Currently secretCode is required for all public confessions.
-        // If it's the owner, check code. If it's the recipient, allow.
-        if (isOwner) {
-            const isMatch = await bcrypt.compare(secretCode, confession.secretCode);
-            if (!isMatch) return res.status(401).json({ message: 'Incorrect secret code' });
-        }
-
         await Confession.findByIdAndDelete(req.params.id);
-        // Also clean up comments
         await Comment.deleteMany({ confessionId: req.params.id });
         res.json({ message: 'Confession deleted successfully' });
     } catch (err) {

@@ -7,7 +7,6 @@ export default function CommentItem({
     onReply,
     onLike,
     onDelete,
-    onReport,
     isReply = false
 }) {
     const [isLiking, setIsLiking] = useState(false);
@@ -61,12 +60,6 @@ export default function CommentItem({
                                 Delete
                             </button>
                         )}
-
-                        {user && user._id !== comment.userId && (
-                            <button className={styles.actionLink} type="button" onClick={() => onReport(comment._id)}>
-                                Report
-                            </button>
-                        )}
                     </div>
                 </div>
             </div>
@@ -80,7 +73,6 @@ export default function CommentItem({
                             user={user}
                             onLike={onLike}
                             onDelete={onDelete}
-                            onReport={onReport}
                             isReply={true}
                         />
                     ))}
