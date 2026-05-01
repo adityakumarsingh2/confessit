@@ -47,12 +47,18 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
             };
         }
 
-        await onSubmit(payload);
-        setText('');
-        setSecretCode('');
-        setPollEnabled(false);
-        setPollOptions(['', '']);
-        setBusy(false);
+        try {
+            await onSubmit(payload);
+            setText('');
+            setSecretCode('');
+            setPollEnabled(false);
+            setPollOptions(['', '']);
+        } catch (err) {
+            // onSubmit (handlePost in App.jsx) already fires addToast for errors
+            console.error('Post failed:', err.message);
+        } finally {
+            setBusy(false);
+        }
     };
 
     const handleAddOption = () => {
@@ -155,7 +161,14 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
                 <div className={styles.actions}>
                     <button
                         type="button"
-                        onClick={() => onSaveDraft({ text, mood })}
+                        onClick={async () => {
+                            if (!text.trim()) return;
+                            try {
+                                await onSaveDraft({ text, mood });
+                            } catch (err) {
+                                console.error('Draft save failed:', err.message);
+                            }
+                        }}
                         className="btn btn-ghost"
                         disabled={!text.trim()}
                     >

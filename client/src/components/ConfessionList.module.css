@@ -3,6 +3,32 @@
     padding: 0 0 4rem;
 }
 
+/* ── Skeleton Shimmer ── */
+.skeleton {
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    position: relative;
+    background: rgba(18, 18, 22, 0.8);
+    border: 1px solid var(--border);
+}
+
+.skeleton > div {
+    border-radius: 6px;
+    background: linear-gradient(90deg,
+        rgba(255,255,255,0.04) 0%,
+        rgba(255,255,255,0.09) 50%,
+        rgba(255,255,255,0.04) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 .controls {
     display: flex;
     flex-direction: column;
@@ -142,14 +168,24 @@
 }
 
 .emptyIcon {
-    font-size: 4rem;
-    margin-bottom: 1.5rem;
-    filter: grayscale(0.5);
+    font-size: 3.5rem;
+    margin-bottom: 1.25rem;
+    display: block;
 }
 
 .empty h3 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    font-weight: 800;
     margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.empty p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    max-width: 300px;
+    margin: 0 auto;
+    line-height: 1.6;
 }
 
 @media (max-width: 640px) {

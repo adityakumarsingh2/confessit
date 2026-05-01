@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import CommentSection from './CommentSection';
 import styles from './ConfessionCard.module.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
 const DEFAULT_REACTIONS = ['❤️', '😂', '😢', '🔥', '😮'];
 
 const MOOD_LABELS = {
@@ -28,6 +29,7 @@ function timeAgo(dateStr) {
 export default function ConfessionCard({ confession, user, onReact, onBookmark, onPostComment, onUpdate, onDelete, onVote, onPostReply, addToast, isInbox = false }) {
     const [showComments, setShowComments] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const pickerRef = useRef(null);
 
     // Secret Code & Reply Management
     const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +39,21 @@ export default function ConfessionCard({ confession, user, onReact, onBookmark, 
     const [showPrompt, setShowPrompt] = useState(false);
     const [promptType, setPromptType] = useState(null); // 'edit' or 'delete'
     const [promptCode, setPromptCode] = useState('');
+    const [promptError, setPromptError] = useState('');
     const [busy, setBusy] = useState(false);
+    const [confirmDeleteInbox, setConfirmDeleteInbox] = useState(false);
+
+    // Close emoji picker on outside click
+    useEffect(() => {
+        if (!showEmojiPicker) return;
+        const handleOutside = (e) => {
+            if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+                setShowEmojiPicker(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutside);
+        return () => document.removeEventListener('mousedown', handleOutside);
+    }, [showEmojiPicker]);
 
     const handleReplySubmit = async (e) => {
         e.preventDefault();
@@ -87,10 +103,9 @@ export default function ConfessionCard({ confession, user, onReact, onBookmark, 
 
     const handlePromptSubmit = async (e) => {
         e.preventDefault();
-        if (promptType === 'edit' && editText.trim().length < 5) {
-            return; // Potential toast here if needed
-        }
+        if (promptType === 'edit' && editText.trim().length < 5) return;
         setBusy(true);
+        setPromptError('');
         try {
             if (promptType === 'delete') {
                 await onDelete(confession._id, promptCode);
@@ -103,7 +118,7 @@ export default function ConfessionCard({ confession, user, onReact, onBookmark, 
                 setPromptCode('');
             }
         } catch (err) {
-            // Keep prompt open on error
+            setPromptError(err.message || 'Incorrect code. Please try again.');
         } finally {
             setBusy(false);
         }
@@ -126,9 +141,7 @@ export default function ConfessionCard({ confession, user, onReact, onBookmark, 
     };
 
     const handleShare = () => {
-        // Point to the backend port (5000) so the share route can serve meta tags
-        const backendUrl = `${window.location.protocol}//${window.location.hostname}:5000`;
-        const shareUrl = `${backendUrl}/share/${confession._id}`;
+        const shareUrl = `${window.location.origin}/?share=${confession._id}`;
         navigator.clipboard.writeText(shareUrl);
         if (addToast) addToast('Link copied to clipboard! 🔗');
     };
@@ -207,17 +220,27 @@ export default function ConfessionCard({ confession, user, onReact, onBookmark, 
                         </button>
                     )}
                     {confession.isReplied && (
-                        <span className={styles.repliedBadge}>✅ Replied & Published</span>
+                        <span className={styles.repliedBadge}>✅ Replied &amp; Published</span>
                     )}
-                    <button
-                        className={`${styles.inboxBtn} ${styles.deleteInboxBtn}`}
-                        onClick={() => { if (window.confirm('Delete this message?')) onDelete(confession._id, 'skip-code'); }}
-                        title="Delete this message"
-                        disabled={busy}
-                    >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        Delete
-                    </button>
+                    {!confirmDeleteInbox ? (
+                        <button
+                            className={`${styles.inboxBtn} ${styles.deleteInboxBtn}`}
+                            onClick={() => setConfirmDeleteInbox(true)}
+                            title="Delete this message"
+                            disabled={busy}
+                        >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            Delete
+                        </button>
+                    ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Sure?</span>
+                            <button className={`${styles.inboxBtn} ${styles.deleteInboxBtn}`} onClick={() => { onDelete(confession._id, 'skip-code'); setBusy(true); }} disabled={busy}>
+                                {busy ? 'Deleting...' : 'Yes, Delete'}
+                            </button>
+                            <button className={`${styles.inboxBtn}`} style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)', border: '1px solid var(--border)' }} onClick={() => setConfirmDeleteInbox(false)}>Cancel</button>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -268,7 +291,7 @@ export default function ConfessionCard({ confession, user, onReact, onBookmark, 
                                 </button>
                             ))}
 
-                            <div className={styles.pickerWrapper}>
+                            <div className={styles.pickerWrapper} ref={pickerRef}>
                                 <button
                                     className={styles.addReact}
                                     type="button"
@@ -359,13 +382,18 @@ export default function ConfessionCard({ confession, user, onReact, onBookmark, 
                             className={styles.promptInput}
                             placeholder="Secret Code"
                             value={promptCode}
-                            onChange={(e) => setPromptCode(e.target.value)}
+                            onChange={(e) => { setPromptCode(e.target.value); setPromptError(''); }}
                             required
                             autoFocus
                         />
+                        {promptError && (
+                            <p style={{ color: 'var(--danger)', fontSize: '0.82rem', marginTop: '-0.5rem', marginBottom: '0.75rem' }}>
+                                ⚠ {promptError}
+                            </p>
+                        )}
                         <div className={styles.promptActions}>
                             <button type="button" onClick={cancelPrompt} className="btn btn-ghost btn-sm">Cancel</button>
-                            <button type="submit" className={`btn ${promptType === 'delete' ? 'btn-primary' : 'btn-primary'} btn-sm`} disabled={busy || (promptType === 'edit' && editText.trim().length < 5) || promptCode.length < 4}>
+                            <button type="submit" className={`btn ${promptType === 'delete' ? 'btn-danger' : 'btn-primary'} btn-sm`} disabled={busy || (promptType === 'edit' && editText.trim().length < 5) || promptCode.length < 4}>
                                 {busy ? 'Verifying...' : `Confirm ${promptType === 'edit' ? 'Edit' : 'Delete'}`}
                             </button>
                         </div>

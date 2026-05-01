@@ -4,10 +4,17 @@ import styles from './ConfessionList.module.css';
 
 function SkeletonCard() {
     return (
-        <div className={`glass ${styles.skeleton}`}>
-            <div className="skeleton" style={{ height: 16, width: '100%', marginBottom: 10 }} />
-            <div className="skeleton" style={{ height: 16, width: '80%', marginBottom: 10 }} />
-            <div className="skeleton" style={{ height: 16, width: '60%' }} />
+        <div className={styles.skeleton}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                    <div style={{ height: '14px', width: '40%', marginBottom: '8px' }} />
+                    <div style={{ height: '12px', width: '25%' }} />
+                </div>
+            </div>
+            <div style={{ height: '14px', width: '100%', marginBottom: '10px' }} />
+            <div style={{ height: '14px', width: '85%', marginBottom: '10px' }} />
+            <div style={{ height: '14px', width: '60%' }} />
         </div>
     );
 }

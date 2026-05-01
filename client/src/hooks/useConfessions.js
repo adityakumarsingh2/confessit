@@ -225,6 +225,7 @@ export function useConfessions() {
         const res = await fetch(`${API}/confessions/private`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error('Failed to send message');

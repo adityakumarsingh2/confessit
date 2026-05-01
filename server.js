@@ -48,12 +48,7 @@ const isAuth = (req, res, next) => {
 };
 
 // --- Auth Routes ---
-app.get('/auth/google', (req, res, next) => {
-    console.log('--- OAuth Request Started ---');
-    console.log('Environment CALLBACK_URL:', process.env.CALLBACK_URL);
-    console.log('Headers Host:', req.headers.host);
-    next();
-}, passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: (process.env.CLIENT_ORIGIN || 'http://localhost:5173') + '/?error=auth_failed' }),
