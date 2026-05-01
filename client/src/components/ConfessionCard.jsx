@@ -5,6 +5,7 @@ import styles from './ConfessionCard.module.css';
 const DEFAULT_REACTIONS = ['❤️', '😂', '😢', '🔥', '😮'];
 
 const MOOD_LABELS = {
+    'NGL': '🙈 NGL',
     'Relationship': '❤️ Crush',
     'Friends': '🔥 Hot take',
     'Personal Thoughts': '💔 Secret',

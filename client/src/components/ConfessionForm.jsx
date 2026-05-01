@@ -2,11 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import styles from './ConfessionForm.module.css';
 
 const MAX = 1000;
-const MOODS = ['Study', 'Relationship', 'Family', 'Friends', 'Feelings', 'Personal Thoughts', 'Career', 'Mental Health', 'College', 'Others'];
+const MOODS = ['NGL', 'Study', 'Relationship', 'Family', 'Friends', 'Feelings', 'Personal Thoughts', 'Career', 'Mental Health', 'College', 'Others'];
 
 export default function ConfessionForm({ onSubmit, onSaveDraft }) {
     const [text, setText] = useState('');
-    const [mood, setMood] = useState('Others');
+    const [mood, setMood] = useState('NGL');
     const [isAnonymous, setIsAnonymous] = useState(true);
     const [allowComments, setAllowComments] = useState(true);
     const [pollEnabled, setPollEnabled] = useState(false);

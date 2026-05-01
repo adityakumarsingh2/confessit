@@ -12,8 +12,8 @@ const ConfessionSchema = new mongoose.Schema({
     },
     mood: {
         type: String,
-        enum: ['Study', 'Relationship', 'Family', 'Friends', 'Feelings', 'Personal Thoughts', 'Career', 'Mental Health', 'College', 'Others'],
-        default: 'Others'
+        enum: ['NGL', 'Study', 'Relationship', 'Family', 'Friends', 'Feelings', 'Personal Thoughts', 'Career', 'Mental Health', 'College', 'Others'],
+        default: 'NGL'
     },
     // Cached anon info from the user at the time of posting
     anonName: String,

@@ -6,22 +6,23 @@ export default function PublicProfile({ userId, fetchPublicUser, onSend, addToas
     const [targetUser, setTargetUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
-    const [selectedMood, setSelectedMood] = useState('❤️ Crush');
+    const [selectedMood, setSelectedMood] = useState('🙈 NGL');
     const [sent, setSent] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
 
     const MOODS = [
-        { label: '❤️ Crush', value: 'Relationship' },
+        { label: '🙈 NGL', value: 'NGL' },
         { label: '🔥 Hot take', value: 'Friends' },
-        { label: '😂 Funny', value: 'Relationship' },
+        { label: '😂 Funny', value: 'Feelings' },
         { label: '💔 Secret', value: 'Personal Thoughts' },
-        { label: '😈 Roast', value: 'Friends' }
+        { label: '😈 Roast', value: 'Friends' },
+        { label: '❤️ Crush', value: 'Relationship' },
     ];
 
     const SUGGESTIONS = [
-        "Someone has a crush on you 👀",
-        "You are secretly admired",
-        "Do you miss someone right now?",
+        "Not gonna lie, you're really impressive 👏",
+        "I have a huge crush on you 👀",
+        "You are secretly admired more than you think",
         "I've been thinking about you lately..."
     ];
 
