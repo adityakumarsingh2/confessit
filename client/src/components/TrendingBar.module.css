@@ -5,7 +5,13 @@
 }
 
 .widget {
-    padding: var(--sp-6);
+    padding: var(--sp-5) var(--sp-6);
+    background: rgba(18, 18, 20, 0.8);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: var(--transition);
 }
 
 .header {
@@ -61,7 +67,7 @@
 .rankBadge {
     width: 24px;
     height: 24px;
-    background: rgba(131, 58, 180, 0.1);
+    background: rgba(59, 130, 246, 0.1);
     border: 1px solid var(--border-glow);
     border-radius: 6px;
     display: flex;
@@ -110,21 +116,24 @@
 }
 
 .topicTag {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border);
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid rgba(59, 130, 246, 0.15);
     border-radius: var(--radius-sm);
-    padding: 0.4rem 0.75rem;
+    padding: 0.4rem 0.85rem;
     color: var(--text-muted);
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    font-family: inherit;
 }
 
 .topicTag:hover {
-    background: var(--grad-subtle);
-    color: var(--text);
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--primary-light);
     border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
 .empty {

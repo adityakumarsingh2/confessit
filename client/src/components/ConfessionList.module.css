@@ -105,7 +105,7 @@
     background: var(--grad-subtle);
     border-color: var(--primary);
     color: var(--text);
-    box-shadow: 0 0 20px rgba(131, 58, 180, 0.15);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
 }
 
 .meta {

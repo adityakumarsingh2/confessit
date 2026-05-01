@@ -6,11 +6,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--sp-8);
-    height: 72px;
-    background: rgba(2, 6, 23, 0.7);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    height: 68px;
+    background: rgba(9, 9, 11, 0.85);
+    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
     border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .brand {
@@ -77,24 +78,23 @@
 
 .searchInput {
     width: 100%;
-    height: 42px;
-    padding-left: 3.25rem;
+    height: 40px;
+    padding-left: 3rem;
     padding-right: var(--sp-4);
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border);
     border-radius: 24px;
     color: var(--text);
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     transition: var(--transition);
 }
 
 .searchInput:focus {
     outline: none;
-    background: rgba(0, 0, 0, 0.2);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(131, 58, 180, 0.1);
-    max-width: 400px;
+    background: rgba(59, 130, 246, 0.06);
+    border-color: var(--border-glow);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .searchInput:focus+.searchIcon {

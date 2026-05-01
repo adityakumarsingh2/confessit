@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { Lock, ShieldCheck, Globe, MessageCircleHeart, Sparkles } from 'lucide-react';
 import { useConfessions } from './hooks/useConfessions';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
@@ -194,12 +195,49 @@ export default function App() {
                 {/* Hero - Only show for guests */}
                 {!user && (
                     <div className={styles.hero}>
-                        <h1 className={styles.heroTitle}>
-                            <span className="grad-text">Anonymous</span> Confessions
-                        </h1>
-                        <p className={styles.heroParagraph}>
-                            Share your soul. Everyone is listening, but no one knows who you are. 🤫
-                        </p>
+                        <div className={styles.heroBackground}>
+                            <div className={`${styles.orb} ${styles.orb1}`}></div>
+                            <div className={`${styles.orb} ${styles.orb2}`}></div>
+                            <div className={`${styles.orb} ${styles.orb3}`}></div>
+                        </div>
+                        
+                        <div className={styles.heroContent}>
+                            <div className={styles.badgeWrapper}>
+                                <span className={styles.heroBadge}><Sparkles size={14} style={{display:'inline-block', verticalAlign:'middle', marginRight:'6px'}} /> The #1 Anonymous Confessions Platform</span>
+                            </div>
+                            <h1 className={styles.heroTitle}>
+                                Speak your truth, <br/>
+                                <span className="grad-text">Stay Anonymous.</span>
+                            </h1>
+                            <p className={styles.heroParagraph}>
+                                Join a safe space to share your deepest thoughts, secrets, and stories without fear of judgment. Everyone is listening, but no one knows who you are.
+                            </p>
+                            
+                            <div className={styles.heroCta}>
+                                <a href={`${import.meta.env.VITE_API_URL || ''}/auth/google`} className={`btn btn-primary ${styles.ctaButton}`}>
+                                    Start Confessing Now
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                </a>
+                            </div>
+
+                            <div className={styles.featureCards}>
+                                <div className={`glass ${styles.featureCard}`}>
+                                    <div className={styles.featureIcon}><ShieldCheck size={26} color="var(--primary)" /></div>
+                                    <h3>100% Anonymous</h3>
+                                    <p>Your real identity is never stored, shared, or exposed. Speak freely.</p>
+                                </div>
+                                <div className={`glass ${styles.featureCard}`}>
+                                    <div className={styles.featureIcon}><Globe size={26} color="var(--primary)" /></div>
+                                    <h3>Global Community</h3>
+                                    <p>Connect with millions of users sharing their authentic selves.</p>
+                                </div>
+                                <div className={`glass ${styles.featureCard}`}>
+                                    <div className={styles.featureIcon}><MessageCircleHeart size={26} color="var(--primary)" /></div>
+                                    <h3>Zero Judgment</h3>
+                                    <p>A safe, supportive environment where your voice truly matters.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -229,11 +267,15 @@ export default function App() {
                             {user && currentView === 'feed' && <ConfessionForm onSubmit={handlePost} onSaveDraft={saveDraft} />}
 
                             {!user && currentView === 'feed' && (
-                                <div className={`glass ${styles.loginPrompt}`}>
-                                    <span className={styles.loginEmoji}>🔐</span>
-                                    <h3>Login to Confess</h3>
-                                    <p>You need to sign in with Google to post. Your identity remains hidden.</p>
-                                    <a href={`${import.meta.env.VITE_API_URL || ''}/auth/google`} className="btn btn-primary">Login with Google</a>
+                                <div className={`glass ${styles.loginPrompt}`} style={{ padding: '3rem 2rem', border: '1px solid var(--border-glow)' }}>
+                                    <div style={{ background: 'rgba(59, 130, 246, 0.1)', width: '70px', height: '70px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: 'var(--shadow-glow)' }}>
+                                        <Lock size={32} color="var(--primary)" />
+                                    </div>
+                                    <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '0.5rem' }}>Login to Confess</h3>
+                                    <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1rem', maxWidth: '400px', margin: '0 auto' }}>You need to sign in with Google to post. Your identity remains hidden.</p>
+                                    <a href={`${import.meta.env.VITE_API_URL || ''}/auth/google`} className={`btn btn-primary ${styles.ctaButton}`} style={{ padding: '0.8rem 2rem' }}>
+                                        Login with Google
+                                    </a>
                                 </div>
                             )}
 

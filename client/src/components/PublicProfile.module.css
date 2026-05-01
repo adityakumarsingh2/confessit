@@ -200,7 +200,7 @@
 }
 
 .suggestBtn:hover {
-    background: rgba(131, 58, 180, 0.1);
+    background: rgba(59, 130, 246, 0.1);
     border-color: var(--primary);
     transform: translateX(8px);
 }

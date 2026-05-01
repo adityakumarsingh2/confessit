@@ -1,14 +1,25 @@
+import { Home, Inbox, FileText, Bookmark, Archive, RefreshCw, Copy, UserCircle2 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
 export default function Sidebar({ user, activity, unreadCount, currentView, onNavigate, onRegenerate }) {
-    if (!user) return <div className={styles.sidebar}>Please login to see profile</div>;
+    if (!user) return (
+        <aside className={`${styles.sidebar} sticky-top`}>
+            <div className={`glass ${styles.profileCard}`} style={{ textAlign: 'center', padding: '3rem 1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ background: 'rgba(255,255,255,0.05)', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', border: '1px solid var(--border)' }}>
+                    <UserCircle2 size={32} color="var(--text-muted)" />
+                </div>
+                <h3 className={styles.anonName} style={{ marginBottom: '0.5rem', fontSize: '1.2rem' }}>Guest Mode</h3>
+                <p className={styles.realName} style={{ lineHeight: '1.5', fontSize: '0.9rem' }}>Login to unlock your profile and track your secrets.</p>
+            </div>
+        </aside>
+    );
 
     const navItems = [
-        { id: 'feed', label: 'Main Feed', icon: '🏠' },
-        { id: 'inbox', label: 'Anonymous Inbox', icon: '📩', badge: unreadCount }, // For NGL messages
-        { id: 'my-posts', label: 'My Secrets', icon: '📝' },
-        { id: 'bookmarks', label: 'Bookmarks', icon: '🔖' },
-        { id: 'drafts', label: 'Drafts', icon: '💾', badge: activity?.drafts?.length }
+        { id: 'feed', label: 'Main Feed', icon: <Home size={20} /> },
+        { id: 'inbox', label: 'Anonymous Inbox', icon: <Inbox size={20} />, badge: unreadCount }, // For NGL messages
+        { id: 'my-posts', label: 'My Secrets', icon: <FileText size={20} /> },
+        { id: 'bookmarks', label: 'Bookmarks', icon: <Bookmark size={20} /> },
+        { id: 'drafts', label: 'Drafts', icon: <Archive size={20} />, badge: activity?.drafts?.length }
     ];
 
     const shareUrl = `${window.location.origin}/?send=${user._id}`;
@@ -26,7 +37,7 @@ export default function Sidebar({ user, activity, unreadCount, currentView, onNa
                 <div className={styles.avatarWrapper}>
                     <img src={user.anonAvatar} alt="avatar" className={styles.avatar} />
                     <button type="button" onClick={onRegenerate} className={styles.cycleBtn} title="Regenerate Identity">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        <RefreshCw size={14} strokeWidth={3} />
                     </button>
                 </div>
                 <div className={styles.info}>
@@ -37,10 +48,12 @@ export default function Sidebar({ user, activity, unreadCount, currentView, onNa
                 </div>
 
                 <div className={styles.nglSection}>
-                    <p className={styles.nglHint}>Share your link to get secrets 🤫</p>
+                    <p className={styles.nglHint}>Share your link to get secrets <span role="img" aria-label="shush">🤫</span></p>
                     <div className={styles.copyGroup}>
                         <input readOnly value={shareUrl} className={styles.shareInput} />
-                        <button onClick={handleCopy} className={styles.copyBtn}>Copy</button>
+                        <button onClick={handleCopy} className={styles.copyBtn} style={{display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center'}}>
+                            <Copy size={14} /> Copy
+                        </button>
                     </div>
                 </div>
 
