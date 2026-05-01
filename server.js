@@ -2,9 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const session = require('express-session');
 const cors = require('cors');           
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const Confession = require('./models/Confession');
 
 // Passport Config
@@ -29,23 +29,22 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        sameSite: 'none',
+        secure: true
+    }
+}));
 app.use(passport.initialize());
+app.use(passport.session());
 
 // --- Helper: Auth Middleware ---
-const isAuth = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Authentication required' });
-    }
-    const token = authHeader.split(' ')[1];
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret_key');
-        req.user = await User.findById(decoded._id);
-        if (!req.user) throw new Error();
-        next();
-    } catch (e) {
-        res.status(401).json({ message: 'Invalid or expired token' });
-    }
+const isAuth = (req, res, next) => {
+    if (req.isAuthenticated()) return next();
+    res.status(401).json({ message: 'Authentication required' });
 };
 
 // --- Auth Routes ---
@@ -54,24 +53,20 @@ app.get('/auth/google', (req, res, next) => {
     console.log('Environment CALLBACK_URL:', process.env.CALLBACK_URL);
     console.log('Headers Host:', req.headers.host);
     next();
-}, passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+}, passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: (process.env.CLIENT_ORIGIN || 'http://localhost:5173') + '/?error=auth_failed', session: false }),
+    passport.authenticate('google', { failureRedirect: (process.env.CLIENT_ORIGIN || 'http://localhost:5173') + '/?error=auth_failed' }),
     (req, res) => {
-        // Generate JWT token
-        const token = jwt.sign(
-            { _id: req.user._id },
-            process.env.JWT_SECRET || 'your_jwt_secret_key',
-            { expiresIn: '7d' }
-        );
-        res.redirect(`${process.env.CLIENT_ORIGIN || 'http://localhost:5173'}?token=${token}`);
+        res.redirect(process.env.CLIENT_ORIGIN || 'http://localhost:5173');
     }
 );
 
-app.get('/auth/logout', (req, res) => {
-    // With JWT, logout is handled on the client by removing the token.
-    res.json({ message: 'Logged out successfully' });
+app.get('/auth/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) return next(err);
+        res.redirect(process.env.CLIENT_ORIGIN || 'http://localhost:5173');
+    });
 });
 
 // --- User Activity & Auth Routes ---

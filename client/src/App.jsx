@@ -71,16 +71,6 @@ export default function App() {
     // --- Share Link & Inbox Handling ---
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        
-        // Handle JWT Auth Redirect
-        const token = params.get('token');
-        if (token) {
-            localStorage.setItem('token', token);
-            // Remove token from URL for security
-            window.history.replaceState({}, '', window.location.pathname);
-            addToast('Logged in successfully! 🚀', 'success');
-        }
-
         const shareId = params.get('share');
         const sendTo = params.get('send');
 
