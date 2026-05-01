@@ -3,6 +3,14 @@ import { useState, useEffect, useCallback } from 'react';
 const API_BASE = import.meta.env.VITE_API_URL || '';
 const API = `${API_BASE}/api`;
 
+const getAuthHeaders = (isJson = false) => {
+    const headers = {};
+    const token = localStorage.getItem('token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (isJson) headers['Content-Type'] = 'application/json';
+    return headers;
+};
+
 export function useConfessions() {
     const [confessions, setConfessions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,7 +22,7 @@ export function useConfessions() {
         try {
             if (!silent) setLoading(true);
             const params = new URLSearchParams(filters).toString();
-            const res = await fetch(`${API}/confessions?${params}`, { credentials: 'include' });
+            const res = await fetch(`${API}/confessions?${params}`, { headers: getAuthHeaders() });
             if (!res.ok) throw new Error('Failed to load confessions');
             const data = await res.json();
             setConfessions(data);
@@ -28,7 +36,7 @@ export function useConfessions() {
 
     const fetchUser = useCallback(async () => {
         try {
-            const res = await fetch(`${API}/user`, { credentials: 'include' });
+            const res = await fetch(`${API}/user`, { headers: getAuthHeaders() });
             if (!res.ok) { setUser(null); return; }
             const data = await res.json();
             setUser(data);
@@ -39,7 +47,7 @@ export function useConfessions() {
 
     const fetchActivity = useCallback(async () => {
         try {
-            const res = await fetch(`${API}/user/activity`, { credentials: 'include' });
+            const res = await fetch(`${API}/user/activity`, { headers: getAuthHeaders() });
             if (!res.ok) return;
             const data = await res.json();
             setActivity(data);
@@ -50,7 +58,7 @@ export function useConfessions() {
 
     const fetchSingleConfession = useCallback(async (id) => {
         try {
-            const res = await fetch(`${API}/confessions/${id}`, { credentials: 'include' });
+            const res = await fetch(`${API}/confessions/${id}`, { headers: getAuthHeaders() });
             if (!res.ok) return null;
             return await res.json();
         } catch (e) {
@@ -60,8 +68,12 @@ export function useConfessions() {
     }, []);
 
     useEffect(() => {
-        fetchConfessions();
-        fetchUser();
+        // Wait for token to be set if it's in the URL
+        const params = new URLSearchParams(window.location.search);
+        if (!params.get('token')) {
+            fetchConfessions();
+            fetchUser();
+        }
     }, [fetchConfessions, fetchUser]);
 
     useEffect(() => {
@@ -73,8 +85,7 @@ export function useConfessions() {
     const postConfession = async (payload) => {
         const res = await fetch(`${API}/confessions`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            headers: getAuthHeaders(true),
             body: JSON.stringify(payload),
         });
         if (!res.ok) {
@@ -88,8 +99,7 @@ export function useConfessions() {
     const reactToConfession = async (id, emoji) => {
         const res = await fetch(`${API}/confessions/${id}/react`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            headers: getAuthHeaders(true),
             body: JSON.stringify({ emoji }),
         });
         if (!res.ok) {
@@ -102,7 +112,7 @@ export function useConfessions() {
     const toggleBookmark = async (id) => {
         const res = await fetch(`${API}/user/bookmarks/${id}`, {
             method: 'POST',
-            credentials: 'include',
+            headers: getAuthHeaders(),
         });
         if (!res.ok) throw new Error('Bookmark failed');
         await fetchActivity();
@@ -111,8 +121,7 @@ export function useConfessions() {
     const saveDraft = async (payload) => {
         const res = await fetch(`${API}/user/drafts`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            headers: getAuthHeaders(true),
             body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error('Draft save failed');
@@ -122,8 +131,7 @@ export function useConfessions() {
     const postComment = async (confessionId, payload) => {
         const res = await fetch(`${API}/confessions/${confessionId}/comments`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            headers: getAuthHeaders(true),
             body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error('Comment failed');
@@ -133,8 +141,7 @@ export function useConfessions() {
     const voteOnPoll = async (id, optionIndex) => {
         const res = await fetch(`${API}/confessions/${id}/vote`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            headers: getAuthHeaders(true),
             body: JSON.stringify({ optionIndex }),
         });
         if (!res.ok) throw new Error('Vote failed');
@@ -144,8 +151,7 @@ export function useConfessions() {
     const updateConfession = async (id, payload) => {
         const res = await fetch(`${API}/confessions/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            headers: getAuthHeaders(true),
             body: JSON.stringify(payload),
         });
         if (!res.ok) {
@@ -158,8 +164,7 @@ export function useConfessions() {
     const deleteConfession = async (id, secretCode) => {
         const res = await fetch(`${API}/confessions/${id}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            headers: getAuthHeaders(true),
             body: JSON.stringify({ secretCode }),
         });
         if (!res.ok) {
@@ -173,7 +178,7 @@ export function useConfessions() {
     const regenerateIdentity = async () => {
         const res = await fetch(`${API}/user/regenerate-identity`, {
             method: 'POST',
-            credentials: 'include',
+            headers: getAuthHeaders(),
         });
         if (!res.ok) throw new Error('Failed to regenerate');
         const data = await res.json();
@@ -187,7 +192,7 @@ export function useConfessions() {
     }, []);
 
     const fetchInbox = useCallback(async (markAsRead = false) => {
-        const res = await fetch(`${API}/user/inbox${markAsRead ? '?markAsRead=true' : ''}`, { credentials: 'include' });
+        const res = await fetch(`${API}/user/inbox${markAsRead ? '?markAsRead=true' : ''}`, { headers: getAuthHeaders() });
         if (!res.ok) return [];
         const data = await res.json();
         if (markAsRead) setUnreadCount(0);
@@ -196,14 +201,11 @@ export function useConfessions() {
 
     const fetchUnreadCount = useCallback(async () => {
         try {
-            const res = await fetch(`${API}/user/inbox/unread-count`, { credentials: 'include' });
+            const res = await fetch(`${API}/user/inbox/unread-count`, { headers: getAuthHeaders() });
             if (!res.ok) return;
             const { count } = await res.json();
             setUnreadCount(prev => {
                 if (count > prev) {
-                    // Trigger a custom event or we expect the caller to handle toast?
-                    // Let's use a custom event or a callback passed to useConfessions if we had one.
-                    // For now, we'll dispatch a window event that App.jsx can listen to.
                     window.dispatchEvent(new CustomEvent('new-confession', { detail: { count: count - prev } }));
                 }
                 return count;
@@ -224,7 +226,7 @@ export function useConfessions() {
     const postPrivateConfession = async (payload) => {
         const res = await fetch(`${API}/confessions/private`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(true),
             body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error('Failed to send message');
@@ -234,8 +236,7 @@ export function useConfessions() {
     const postReply = async (id, text) => {
         const res = await fetch(`${API}/confessions/${id}/reply`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            headers: getAuthHeaders(true),
             body: JSON.stringify({ text }),
         });
         if (!res.ok) {
