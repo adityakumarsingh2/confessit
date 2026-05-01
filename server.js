@@ -15,6 +15,10 @@ const Comment = require('./models/Comment');
 
 const app = express();
 
+if (!process.env.CLIENT_ORIGIN) {
+    console.warn(' [WARNING] CLIENT_ORIGIN is not set. Redirects will default to localhost.');
+}
+
 // Trust proxy (required for session cookies over proxy)
 app.set('trust proxy', 1);
 
@@ -37,7 +41,7 @@ app.use(session({
     cookie: {
         secure: true,
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: 'lax', // Use 'lax' for proxied same-domain requests
         maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     }
 }));
