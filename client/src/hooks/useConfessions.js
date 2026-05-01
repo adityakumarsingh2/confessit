@@ -180,7 +180,7 @@ export function useConfessions() {
     };
 
     const fetchPublicUser = useCallback(async (id) => {
-        const res = await fetch(`${API}/users/${id}`);
+        const res = await fetch(`${API}/users/${id}`, { credentials: 'include' });
         if (!res.ok) return null;
         return await res.json();
     }, []);

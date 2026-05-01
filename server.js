@@ -16,7 +16,7 @@ const Comment = require('./models/Comment');
 const app = express();
 
 // Trust proxy (required for session cookies over proxy)
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 // DB Connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/confession_wall')
@@ -33,9 +33,12 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'secret',
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
+        secure: true,
+        httpOnly: true,
         sameSite: 'none',
-        secure: true
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     }
 }));
 app.use(passport.initialize());
