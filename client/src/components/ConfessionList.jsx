@@ -19,7 +19,7 @@ function SkeletonCard() {
     );
 }
 
-export default function ConfessionList({ confessions, loading, user, onReact, onBookmark, onPostComment, onUpdate, onDelete, onVote, onPostReply, addToast, isInbox = false }) {
+export default function ConfessionList({ confessions, loading, user, activity, onReact, onBookmark, onPostComment, onUpdate, onDelete, onVote, onPostReply, addToast, isInbox = false }) {
     if (loading) {
         return (
             <div className={styles.grid}>
@@ -48,6 +48,7 @@ export default function ConfessionList({ confessions, loading, user, onReact, on
                         key={c._id}
                         confession={c}
                         user={user}
+                        activity={activity}
                         onReact={onReact}
                         onBookmark={onBookmark}
                         onPostComment={onPostComment}

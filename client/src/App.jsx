@@ -252,6 +252,7 @@ export default function App() {
                                 confessions={filteredList}
                                 loading={loading}
                                 user={user}
+                                activity={activity}
                                 onReact={handleReact}
                                 onBookmark={handleBookmark}
                                 onPostComment={handlePostComment}

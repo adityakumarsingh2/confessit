@@ -26,7 +26,7 @@ function timeAgo(dateStr) {
     return `${Math.floor(diff / 86400)}d ago`;
 }
 
-export default function ConfessionCard({ confession, user, onReact, onBookmark, onPostComment, onUpdate, onDelete, onVote, onPostReply, addToast, isInbox = false }) {
+export default function ConfessionCard({ confession, user, activity, onReact, onBookmark, onPostComment, onUpdate, onDelete, onVote, onPostReply, addToast, isInbox = false }) {
     const [showComments, setShowComments] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const pickerRef = useRef(null);
@@ -126,7 +126,7 @@ export default function ConfessionCard({ confession, user, onReact, onBookmark, 
 
     const isOwner = user?._id === confession.userId;
     const isRecipient = user?._id === confession.recipientId?.toString();
-    const isBookmarked = activity => activity?.bookmarks?.some(b => (b._id || b) === confession._id);
+    const isBookmarked = activity?.bookmarks?.some(b => (b._id || b) === confession._id);
 
     return (
         <article className={`glass ${styles.card} ${confession.isReplied ? styles.repliedCard : ''} slide-up`}>
@@ -346,9 +346,9 @@ export default function ConfessionCard({ confession, user, onReact, onBookmark, 
                             onClick={() => onBookmark(confession._id)}
                             disabled={!user}
                             title="Bookmark"
-                            style={{ color: user?.bookmarks?.includes(confession._id) ? 'var(--warning)' : undefined }}
+                            style={{ color: isBookmarked ? 'var(--warning)' : undefined }}
                         >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill={user?.bookmarks?.includes(confession._id) ? 'var(--warning)' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill={isBookmarked ? 'var(--warning)' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
                         </button>
                         {/* Share */}
                         <button className={styles.actionBtn} type="button" onClick={handleShare} title="Share">
