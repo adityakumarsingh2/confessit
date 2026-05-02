@@ -194,7 +194,7 @@ export default function App() {
             />
 
             {!user && currentView === 'feed' && !sharedConfession ? (
-                <LandingPage confessions={confessions} />
+                <LandingPage />
             ) : (
                 <main className={styles.main}>
                     {/* Left Section */}

@@ -26,8 +26,8 @@ function timeAgo(dateStr) {
     return `${Math.floor(diff / 86400)}d ago`;
 }
 
-export default function LandingPage({ confessions }) {
-    const feed = confessions?.length > 0 ? confessions.slice(0, 15) : DUMMY_CONFESSIONS;
+export default function LandingPage() {
+    const feed = DUMMY_CONFESSIONS;
     const doubled = [...feed, ...feed];
 
     return (

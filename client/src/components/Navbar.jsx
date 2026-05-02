@@ -14,20 +14,12 @@ export default function Navbar({ user, onSearch, unreadCount, onNavigate }) {
             <div className={styles.container}>
                 <div className={styles.brand} onClick={() => onNavigate && onNavigate('feed')} style={{ cursor: 'pointer' }}>
                     <div className={styles.logoIcon}>
-                        <svg className={styles.logoSvg} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L4 5V11C4 16.19 7.41 21.05 12 22C16.59 21.05 20 16.19 20 11V5L12 2Z" fill="url(#logo-grad)" />
-                            <path d="M12 16.5C14.4853 16.5 16.5 14.4853 16.5 12C16.5 9.51472 14.4853 7.5 12 7.5C9.51472 7.5 7.5 9.51472 7.5 12C7.5 14.4853 9.51472 16.5 12 16.5Z" fill="white" fillOpacity="0.15" />
-                            <circle cx="12" cy="11.5" r="2" fill="white" />
-                            <path d="M12 13V15" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                            <defs>
-                                <linearGradient id="logo-grad" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
-                                    <stop stopColor="#6366f1" />
-                                    <stop offset="1" stopColor="#ec4899" />
-                                </linearGradient>
-                            </defs>
-                        </svg>
+                        <img src="/logo.png" alt="ConfessIt Logo" className={styles.logoImg} />
                     </div>
-                    <span className={`${styles.title} grad-text`}>ConfessIt</span>
+                    <div className={styles.titleWrapper}>
+                        <span className={styles.titleConfess}>Confess</span>
+                        <span className={styles.titleIt}>It</span>
+                    </div>
                 </div>
 
                 <div className={styles.center}>
