@@ -573,5 +573,10 @@ app.post('/api/user/drafts', isAuth, async (req, res) => {
     }
 });
 
+// --- Keep Alive Route ---
+app.get('/api/ping', (req, res) => {
+    res.status(200).json({ message: 'Server is awake' });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
