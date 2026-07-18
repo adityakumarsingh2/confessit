@@ -167,7 +167,7 @@ This project demonstrates:
 Aditya Kumar Singh  
 B.Tech CSE  
 Full Stack Developer | MERN Enthusiast
-
+https://adityakumarsingh.tech
 ---
 
 ⭐ If you found this project interesting, consider giving it a star!
