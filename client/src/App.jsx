@@ -9,7 +9,6 @@ import ConfessionList from './components/ConfessionList';
 import PublicProfile from './components/PublicProfile';
 import Toast from './components/Toast';
 import LandingPage from './components/LandingPage';
-import styles from './App.module.css';
 
 let toastId = 0;
 
@@ -185,7 +184,7 @@ export default function App() {
     };
 
     return (
-        <div className={styles.app}>
+        <div className="min-h-screen bg-background text-foreground font-sans relative">
             <Navbar
                 user={user}
                 onSearch={(q) => refresh({ search: q })}
@@ -196,82 +195,91 @@ export default function App() {
             {!user && currentView === 'feed' && !sharedConfession ? (
                 <LandingPage />
             ) : (
-                <main className={styles.main}>
-                    {/* Left Section */}
-                <div className={styles.sidebarSection}>
-                    <Sidebar
-                        user={user}
-                        activity={activity}
-                        unreadCount={unreadCount}
-                        currentView={currentView}
-                        onNavigate={setCurrentView}
-                        onRegenerate={handleRegenerate}
-                    />
-                </div>
-
-                {/* Middle Section */}
-                <div className={styles.feed}>
-                    {currentView === 'send' && sendToId ? (
-                        <PublicProfile
-                            userId={sendToId}
-                            fetchPublicUser={fetchPublicUser}
-                            onSend={postPrivateConfession}
-                            addToast={addToast}
-                        />
-                    ) : (
-                        <>
-                            {user && currentView === 'feed' && <ConfessionForm onSubmit={handlePost} onSaveDraft={saveDraft} />}
-
-                            {!user && currentView === 'feed' && (
-                                <div className={`glass ${styles.loginPrompt}`} style={{ padding: '3rem 2rem', border: '1px solid var(--border-glow)' }}>
-                                    <div style={{ background: 'rgba(59, 130, 246, 0.1)', width: '70px', height: '70px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: 'var(--shadow-glow)' }}>
-                                        <Lock size={32} color="var(--primary)" />
-                                    </div>
-                                    <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '0.5rem' }}>Login to Confess</h3>
-                                    <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1rem', maxWidth: '400px', margin: '0 auto' }}>You need to sign in with Google to post. Your identity remains hidden.</p>
-                                    <a href={`${import.meta.env.VITE_API_URL || ''}/auth/google`} className={`btn btn-primary ${styles.ctaButton}`} style={{ padding: '0.8rem 2rem' }}>
-                                        Login with Google
-                                    </a>
-                                </div>
-                            )}
-
-                            {currentView === 'inbox' && (
-                                <div className={styles.inboxHeader}>
-                                    <h2>My Anonymous Inbox 📩</h2>
-                                    <p>Only you can see these messages.</p>
-                                    {user?.visitCount > 0 && (
-                                        <div className={styles.visitStat}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                                            <strong>{user.visitCount.toLocaleString()}</strong> people visited your secret link
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            <ConfessionList
-                                confessions={filteredList}
-                                loading={loading}
+                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 flex flex-col lg:flex-row gap-8">
+                    {/* Left Section (Sidebar) */}
+                    <div className="w-full lg:w-[280px] shrink-0">
+                        <div className="sticky top-24">
+                            <Sidebar
                                 user={user}
                                 activity={activity}
-                                onReact={handleReact}
-                                onBookmark={handleBookmark}
-                                onPostComment={handlePostComment}
-                                onUpdate={handleUpdate}
-                                onDelete={handleDelete}
-                                onVote={handleVote}
-                                onPostReply={postReply}
-                                addToast={addToast}
-                                isInbox={currentView === 'inbox'}
+                                unreadCount={unreadCount}
+                                currentView={currentView}
+                                onNavigate={setCurrentView}
+                                onRegenerate={handleRegenerate}
                             />
-                        </>
-                    )}
-                </div>
+                        </div>
+                    </div>
 
-                {/* Right Section */}
-                <div className={styles.trendingSection}>
-                    <TrendingBar trendingPosts={confessions} />
-                </div>
-            </main>
+                    {/* Middle Section (Feed) */}
+                    <div className="flex-1 w-full max-w-2xl mx-auto space-y-6">
+                        {currentView === 'send' && sendToId ? (
+                            <PublicProfile
+                                userId={sendToId}
+                                fetchPublicUser={fetchPublicUser}
+                                onSend={postPrivateConfession}
+                                addToast={addToast}
+                            />
+                        ) : (
+                            <>
+                                {user && currentView === 'feed' && <ConfessionForm onSubmit={handlePost} onSaveDraft={saveDraft} />}
+
+                                {!user && currentView === 'feed' && (
+                                    <div className="card-elegant p-10 text-center flex flex-col items-center justify-center space-y-6 relative overflow-hidden">
+                                        {/* Background subtle glow */}
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/5 blur-3xl pointer-events-none" />
+                                        
+                                        <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center shadow-accent relative z-10">
+                                            <Lock size={36} className="text-primary" />
+                                        </div>
+                                        <div className="z-10">
+                                            <h3 className="text-2xl font-bold font-display text-foreground mb-3">Login to Confess</h3>
+                                            <p className="text-muted-foreground max-w-md mx-auto text-base">You need to sign in with Google to post. Your identity remains 100% hidden and secure.</p>
+                                        </div>
+                                        <a href={`${import.meta.env.VITE_API_URL || ''}/auth/google`} className="btn-primary px-8 py-3.5 z-10">
+                                            Login with Google
+                                        </a>
+                                    </div>
+                                )}
+
+                                {currentView === 'inbox' && (
+                                    <div className="space-y-4 mb-8">
+                                        <h2 className="text-3xl font-display font-bold">My Anonymous Inbox 📩</h2>
+                                        <p className="text-muted-foreground">Only you can see these messages.</p>
+                                        {user?.visitCount > 0 && (
+                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-sm font-medium border border-border/50 text-foreground">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                                                <strong>{user.visitCount.toLocaleString()}</strong> people visited your secret link
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                <ConfessionList
+                                    confessions={filteredList}
+                                    loading={loading}
+                                    user={user}
+                                    activity={activity}
+                                    onReact={handleReact}
+                                    onBookmark={handleBookmark}
+                                    onPostComment={handlePostComment}
+                                    onUpdate={handleUpdate}
+                                    onDelete={handleDelete}
+                                    onVote={handleVote}
+                                    onPostReply={postReply}
+                                    addToast={addToast}
+                                    isInbox={currentView === 'inbox'}
+                                />
+                            </>
+                        )}
+                    </div>
+
+                    {/* Right Section (Trending) */}
+                    <div className="hidden xl:block w-[300px] shrink-0">
+                        <div className="sticky top-24">
+                            <TrendingBar trendingPosts={confessions} />
+                        </div>
+                    </div>
+                </main>
             )}
 
             {/* Toasts */}

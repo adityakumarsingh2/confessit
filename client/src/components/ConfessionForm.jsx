@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import styles from './ConfessionForm.module.css';
 
 const MAX = 1000;
 const MOODS = ['NGL', 'Study', 'Relationship', 'Family', 'Friends', 'Feelings', 'Personal Thoughts', 'Career', 'Mental Health', 'College', 'Others'];
@@ -66,45 +65,64 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
     };
 
     return (
-        <form className={`glass ${styles.form} slide-up`} onSubmit={handleSubmit}>
-            <div className={styles.header}>
-                <div className={styles.titleGroup}>
-                    <h2 className={styles.title}>Spill a Secret</h2>
-                    <div className={styles.moodWrapper}>
-                        <select value={mood} onChange={(e) => setMood(e.target.value)} className={styles.moodSelect}>
-                            {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
-                        </select>
+        <form className="card-elegant p-5 sm:p-7 space-y-6 slide-up relative overflow-hidden" onSubmit={handleSubmit}>
+            {/* Subtle glow effect behind form */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 z-10 relative">
+                <div>
+                    <h2 className="text-2xl font-bold font-display text-foreground tracking-tight">Spill a Secret</h2>
+                    <p className="text-sm text-muted-foreground mt-1">Your identity is completely hidden.</p>
+                </div>
+                <div className="relative">
+                    <select 
+                        value={mood} 
+                        onChange={(e) => setMood(e.target.value)} 
+                        className="appearance-none bg-secondary/80 text-foreground text-sm font-medium border border-border/50 rounded-full pl-5 pr-10 py-2.5 outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer shadow-sm backdrop-blur-sm"
+                    >
+                        {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                    <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
             </div>
 
-            <div className={styles.inputWrapper}>
+            <div className="space-y-3 z-10 relative">
                 <textarea
                     ref={textareaRef}
                     placeholder="What's going on? Be honest, it's anonymous... 🤫"
                     value={text}
                     onChange={(e) => setText(e.target.value.slice(0, MAX))}
-                    className={styles.textarea}
+                    className="w-full bg-secondary/30 text-foreground border border-border/50 rounded-2xl p-5 min-h-[140px] resize-none focus:outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/60 text-[15px] leading-relaxed"
                     required
                 />
-                <div className={styles.footerRow}>
-                    <div className={styles.emojiPicker}>
+                
+                <div className="flex items-center justify-between px-1">
+                    <div className="flex flex-wrap gap-1">
                         {['✨', '🔥', '❤️', '😂', '😢', '😮', '💀', '💯'].map(e => (
-                            <button key={e} type="button" onClick={() => addEmoji(e)} className={styles.emojiBtn}>
+                            <button 
+                                key={e} 
+                                type="button" 
+                                onClick={() => addEmoji(e)} 
+                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-secondary text-lg transition-transform hover:scale-110 active:scale-95"
+                            >
                                 {e}
                             </button>
                         ))}
                     </div>
-                    <div className={`${styles.counter} ${text.length > MAX * 0.9 ? styles.warn : ''}`}>
-                        <span className={styles.count}>{MAX - text.length}</span>
+                    <div className={`text-xs font-mono font-medium ${text.length > MAX * 0.9 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                        {text.length} / {MAX}
                     </div>
                 </div>
             </div>
 
             {pollEnabled && (
-                <div className={styles.pollCreator}>
-                    <p className={styles.pollLabel}>Anonymous Poll</p>
-                    <div className={styles.pollOptions}>
+                <div className="p-4 rounded-2xl bg-secondary/40 border border-border/50 space-y-4 z-10 relative">
+                    <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                        <span className="text-primary">📊</span> Anonymous Poll
+                    </p>
+                    <div className="space-y-2.5">
                         {pollOptions.map((opt, i) => (
                             <input
                                 key={i}
@@ -116,12 +134,16 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
                                     newOpts[i] = e.target.value;
                                     setPollOptions(newOpts);
                                 }}
-                                className={styles.pollInput}
+                                className="w-full bg-background border border-border/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all text-foreground placeholder:text-muted-foreground/60"
                             />
                         ))}
                     </div>
                     {pollOptions.length < 5 && (
-                        <button type="button" onClick={handleAddOption} className={styles.addOption}>
+                        <button 
+                            type="button" 
+                            onClick={handleAddOption} 
+                            className="text-xs font-medium text-primary hover:text-primary/80 flex items-center gap-1.5 transition-colors px-1"
+                        >
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             Add Option
                         </button>
@@ -129,21 +151,21 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
                 </div>
             )}
 
-            <div className={styles.controls}>
-                <div className={styles.toggles}>
-                    <label className={`${styles.toggle} ${pollEnabled ? styles.toggleActive : ''}`}>
-                        <input type="checkbox" checked={pollEnabled} onChange={(e) => setPollEnabled(e.target.checked)} />
-                        <span className={styles.toggleIcon}>📊</span>
-                        <span className={styles.toggleText}>Poll</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pt-5 border-t border-border/40 z-10 relative">
+                <div className="flex items-center gap-6 px-1">
+                    <label className={`flex items-center gap-2 cursor-pointer transition-all ${pollEnabled ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+                        <input type="checkbox" className="hidden" checked={pollEnabled} onChange={(e) => setPollEnabled(e.target.checked)} />
+                        <span className="text-lg">📊</span>
+                        <span className="text-sm font-semibold tracking-wide">Poll</span>
                     </label>
-                    <label className={`${styles.toggle} ${allowComments ? styles.toggleActive : ''}`}>
-                        <input type="checkbox" checked={allowComments} onChange={(e) => setAllowComments(e.target.checked)} />
-                        <span className={styles.toggleIcon}>💬</span>
-                        <span className={styles.toggleText}>Comments</span>
+                    <label className={`flex items-center gap-2 cursor-pointer transition-all ${allowComments ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+                        <input type="checkbox" className="hidden" checked={allowComments} onChange={(e) => setAllowComments(e.target.checked)} />
+                        <span className="text-lg">💬</span>
+                        <span className="text-sm font-semibold tracking-wide">Comments</span>
                     </label>
                 </div>
 
-                <div className={styles.actions}>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
                     <button
                         type="button"
                         onClick={async () => {
@@ -151,12 +173,16 @@ export default function ConfessionForm({ onSubmit, onSaveDraft }) {
                             try { await onSaveDraft({ text, mood }); }
                             catch (err) { console.error('Draft save failed:', err.message); }
                         }}
-                        className="btn btn-ghost"
+                        className="px-5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                         disabled={!text.trim()}
                     >
                         Save Draft
                     </button>
-                    <button className="btn btn-primary" type="submit" disabled={busy || text.trim().length < 5}>
+                    <button 
+                        className="btn-primary px-8 py-2.5 flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed shadow-accent hover:shadow-lg" 
+                        type="submit" 
+                        disabled={busy || text.trim().length < 5}
+                    >
                         {busy ? 'Posting...' : 'Post Secret 🚀'}
                     </button>
                 </div>
