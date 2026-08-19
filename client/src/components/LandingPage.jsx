@@ -529,7 +529,7 @@ function usePageAnimations(pageLoaded) {
 }
 
 /* ─── Main Page ─── */
-export default function LandingPage() {
+export default function LandingPage({ onExplore }) {
     const [loaded, setLoaded] = useState(false);
     const handleDone = useCallback(() => setLoaded(true), []);
     const doubled = [...WALL_CONFESSIONS, ...WALL_CONFESSIONS];
@@ -575,9 +575,22 @@ export default function LandingPage() {
 
             {/* ─── NAV ─── */}
             <nav id="ch-nav" className={styles.nav}>
-                <span className={styles.navBrand}>ConfessHere</span>
+                <span
+                    className={styles.navBrand}
+                    onClick={onExplore}
+                    style={{ cursor: 'pointer' }}
+                    title="Enter Dashboard"
+                >
+                    ConfessHere
+                </span>
                 <div className={styles.navRight}>
-                    <span className={styles.navMuted}>anonymous confessions</span>
+                    <button
+                        onClick={onExplore}
+                        className={styles.navMuted}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+                    >
+                        Explore Feed →
+                    </button>
                     <a href={`${API_URL}/auth/google`} className={styles.navCta} id="nav-cta" data-magnetic data-whisper="It's free">
                         Start Confessing
                         <ArrowRight size={14} style={{ marginLeft: 6 }} />
@@ -626,7 +639,16 @@ export default function LandingPage() {
                                 Start confessing
                                 <ArrowRight size={16} />
                             </a>
-                            <span className={styles.heroCtaNote}>No credit card. No email stored.</span>
+                            <button
+                                onClick={onExplore}
+                                className={styles.heroCta}
+                                style={{ background: 'rgba(255,255,255,0.06)', color: '#f0ede8', border: '1px solid rgba(255,255,255,0.12)' }}
+                                data-magnetic
+                                data-whisper="View secrets"
+                            >
+                                Explore Feed
+                                <ChevronRight size={16} />
+                            </button>
                         </div>
                     </div>
 

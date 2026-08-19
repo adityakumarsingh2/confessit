@@ -38,10 +38,30 @@ export default function App() {
     } = useConfessions();
 
     const [currentView, setCurrentView] = useState('feed'); // feed, my-posts, drafts, bookmarks, inbox
+    const [showLanding, setShowLanding] = useState(true);
     const [toasts, setToasts] = useState([]);
     const [sharedConfession, setSharedConfession] = useState(null);
     const [sendToId, setSendToId] = useState(null);
     const [inboxMessages, setInboxMessages] = useState([]);
+
+    // Automatically exit landing view when user logs in or URL specifies feed/error
+    useEffect(() => {
+        if (user) {
+            setShowLanding(false);
+        }
+    }, [user]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('error') || params.get('view') === 'feed') {
+            setShowLanding(false);
+        }
+    }, []);
+
+    const handleNavigate = useCallback((view) => {
+        setCurrentView(view);
+        setShowLanding(false);
+    }, []);
 
     const addToast = useCallback((message, type = 'success') => {
         const id = ++toastId;
@@ -184,7 +204,7 @@ export default function App() {
         }
     };
 
-    const isLandingView = !user && currentView === 'feed' && !sharedConfession;
+    const isLandingView = !user && showLanding && currentView === 'feed' && !sharedConfession;
 
     return (
         <div className={styles.app}>
@@ -193,12 +213,12 @@ export default function App() {
                     user={user}
                     onSearch={(q) => refresh({ search: q })}
                     unreadCount={unreadCount}
-                    onNavigate={setCurrentView}
+                    onNavigate={handleNavigate}
                 />
             )}
 
             {isLandingView ? (
-                <LandingPage />
+                <LandingPage onExplore={() => handleNavigate('feed')} />
             ) : (
                 <main className={styles.main}>
                     {/* Left Section */}
