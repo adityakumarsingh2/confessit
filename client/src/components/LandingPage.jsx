@@ -1,4 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import {
+    Heart, Flame, Brain, GraduationCap, Users, Briefcase, NotebookPen, Home,
+    ShieldCheck, Shuffle, Trash2, EyeOff,
+    ArrowRight, Lock, ChevronRight,
+} from 'lucide-react';
 import styles from './LandingPage.module.css';
 import './LandingPage.animations.css';
 
@@ -50,21 +55,21 @@ const STATS = [
 ];
 
 const CATEGORIES = [
-    { emoji: '💔', label: 'Relationships', sub: 'Feelings you can\'t speak' },
-    { emoji: '🔥', label: 'Hot Takes', sub: 'Thoughts too honest for dinner' },
-    { emoji: '🧠', label: 'Mental Health', sub: 'What you carry quietly' },
-    { emoji: '🎓', label: 'College Life', sub: 'Campus truths, campus lies' },
-    { emoji: '👥', label: 'Friends', sub: 'What you\'d never say to their face' },
-    { emoji: '💼', label: 'Work & Career', sub: 'Office secrets, career doubts' },
-    { emoji: '😔', label: 'Personal', sub: 'Your deepest private thoughts' },
-    { emoji: '👨‍👩‍👧', label: 'Family', sub: 'Things left unsaid at home' },
+    { Icon: Heart,          label: 'Relationships', sub: "Feelings you can't speak",          color: '#e85d7a' },
+    { Icon: Flame,          label: 'Hot Takes',     sub: 'Thoughts too honest for dinner',     color: '#f97316' },
+    { Icon: Brain,          label: 'Mental Health', sub: 'What you carry quietly',              color: '#a78bfa' },
+    { Icon: GraduationCap,  label: 'College Life',  sub: 'Campus truths, campus lies',         color: '#38bdf8' },
+    { Icon: Users,          label: 'Friends',       sub: "What you'd never say to their face", color: '#4ade80' },
+    { Icon: Briefcase,      label: 'Work & Career', sub: 'Office secrets, career doubts',      color: '#facc15' },
+    { Icon: NotebookPen,    label: 'Personal',      sub: 'Your deepest private thoughts',      color: '#fb7185' },
+    { Icon: Home,           label: 'Family',        sub: 'Things left unsaid at home',         color: '#67e8f9' },
 ];
 
 const TRUST_ITEMS = [
-    { icon: '🔐', title: 'Google login prevents bots, not tracks you', body: 'We use Google only to prevent spam. We never connect your identity to what you write.' },
-    { icon: '🎭', title: 'New persona, every confession', body: 'Each post gets a random name and avatar. Nothing links back to your account.' },
-    { icon: '🗑️', title: 'Delete everything, anytime', body: 'Delete your account and every confession you wrote vanishes permanently.' },
-    { icon: '🚫', title: 'Zero ad tracking', body: 'We don\'t run ads. We don\'t sell your data. ConfessHere is supported by users, not advertisers.' },
+    { Icon: ShieldCheck, title: 'Google login prevents bots, not tracks you', body: 'We use Google only to prevent spam. We never connect your identity to what you write.' },
+    { Icon: Shuffle,     title: 'New persona, every confession',               body: 'Each post gets a random name and avatar. Nothing links back to your account.' },
+    { Icon: Trash2,      title: 'Delete everything, anytime',                  body: 'Delete your account and every confession you wrote vanishes permanently.' },
+    { Icon: EyeOff,      title: 'Zero ad tracking',                            body: "We don't run ads. We don't sell your data. ConfessHere is supported by users, not advertisers." },
 ];
 
 const TICKER_TEXT = "Say it  ·  Stay anonymous  ·  No judgment  ·  Be heard  ·  100% private  ·  Real feelings  ·  Unfiltered truth  ·  You're not alone  ·  ";
@@ -575,6 +580,7 @@ export default function LandingPage() {
                     <span className={styles.navMuted}>anonymous confessions</span>
                     <a href={`${API_URL}/auth/google`} className={styles.navCta} id="nav-cta" data-magnetic data-whisper="It's free">
                         Start Confessing
+                        <ArrowRight size={14} style={{ marginLeft: 6 }} />
                     </a>
                 </div>
             </nav>
@@ -618,6 +624,7 @@ export default function LandingPage() {
                             <a href={`${API_URL}/auth/google`} className={styles.heroCta} data-magnetic data-whisper="Anonymous · Free">
                                 <GoogleIcon />
                                 Start confessing
+                                <ArrowRight size={16} />
                             </a>
                             <span className={styles.heroCtaNote}>No credit card. No email stored.</span>
                         </div>
@@ -695,18 +702,23 @@ export default function LandingPage() {
                         <p className={styles.categoriesSub}>Everything. Literally, everything.</p>
                     </div>
                     <div className={styles.categoriesGrid}>
-                        {CATEGORIES.map((cat, i) => (
-                            <div
-                                key={cat.label}
-                                className={styles.categoryCard}
-                                data-reveal
-                                style={{ '--ci': i, transitionDelay: `${i * 0.07}s` }}
-                            >
-                                <span className={styles.categoryEmoji}>{cat.emoji}</span>
-                                <span className={styles.categoryLabel}>{cat.label}</span>
-                                <span className={styles.categorySub}>{cat.sub}</span>
-                            </div>
-                        ))}
+                        {CATEGORIES.map((cat, i) => {
+                            const IconComponent = cat.Icon;
+                            return (
+                                <div
+                                    key={cat.label}
+                                    className={styles.categoryCard}
+                                    data-reveal
+                                    style={{ '--ci': i, transitionDelay: `${i * 0.07}s` }}
+                                >
+                                    <div className={styles.categoryIconWrap} style={{ '--cat-color': cat.color }}>
+                                        <IconComponent size={20} className={styles.categoryIcon} />
+                                    </div>
+                                    <span className={styles.categoryLabel}>{cat.label}</span>
+                                    <span className={styles.categorySub}>{cat.sub}</span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -745,15 +757,20 @@ export default function LandingPage() {
                         <p className={styles.trustSub}>Here's exactly how.</p>
                     </div>
                     <div className={styles.trustGrid}>
-                        {TRUST_ITEMS.map((item, i) => (
-                            <div key={item.title} className={styles.trustItem} data-trust-item style={{ '--ti': i }}>
-                                <span className={styles.trustIcon}>{item.icon}</span>
-                                <div>
-                                    <h4 className={styles.trustTitle}>{item.title}</h4>
-                                    <p className={styles.trustBody}>{item.body}</p>
+                        {TRUST_ITEMS.map((item, i) => {
+                            const TrustIconComp = item.Icon;
+                            return (
+                                <div key={item.title} className={styles.trustItem} data-trust-item style={{ '--ti': i }}>
+                                    <div className={styles.trustIconWrap}>
+                                        <TrustIconComp size={20} className={styles.trustIcon} />
+                                    </div>
+                                    <div>
+                                        <h4 className={styles.trustTitle}>{item.title}</h4>
+                                        <p className={styles.trustBody}>{item.body}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>

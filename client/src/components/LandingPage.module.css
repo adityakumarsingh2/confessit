@@ -978,10 +978,28 @@
 
 .categoryCard:hover::after { opacity: 1; }
 
-.categoryEmoji {
-    font-size: 1.6rem;
-    line-height: 1;
-    margin-bottom: 0.2rem;
+.categoryIconWrap {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    transition: background 0.25s, border-color 0.25s, transform 0.25s;
+}
+
+.categoryCard:hover .categoryIconWrap {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: scale(1.06);
+}
+
+.categoryIcon {
+    color: var(--cat-color, #f0ede8);
+    transition: transform 0.25s;
 }
 
 .categoryLabel {
@@ -1145,11 +1163,21 @@
 
 .trustItem:last-child { border-bottom: none; }
 
-.trustIcon {
-    font-size: 1.4rem;
+.trustIconWrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(212, 90, 26, 0.08);
+    border: 1px solid rgba(212, 90, 26, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    margin-top: 0.05rem;
-    filter: grayscale(0.3);
+    margin-top: 0.1rem;
+}
+
+.trustIcon {
+    color: #d45a1a;
 }
 
 .trustTitle {
