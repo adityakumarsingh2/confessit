@@ -1,8 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './LandingPage.module.css';
+import './LandingPage.animations.css';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
+/* ──────────────────────────────────────────
+   Data
+────────────────────────────────────────── */
 const MOOD_LABELS = {
     'NGL': 'NGL', 'Relationship': 'Crush', 'Friends': 'Hot take',
     'Personal Thoughts': 'Secret', 'Feelings': 'Feelings',
@@ -11,14 +15,14 @@ const MOOD_LABELS = {
 };
 
 const REPRESENTATIVE_CONFESSIONS = [
-    { _id: 'd1', text: "I've been secretly learning guitar for eight months just to surprise my best friend at their wedding.", anonName: "Melodic Ghost", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix", mood: "Personal Thoughts", createdAt: new Date(Date.now() - 3600000).toISOString(), reactions: { '❤️': ['u1', 'u2', 'u3'], '🔥': ['u4', 'u5'] }, commentCount: 7 },
-    { _id: 'd2', text: "I actually prefer working alone. I get so much more done. I just smile and say 'teamwork is great' in every meeting.", anonName: "Cozy Ninja", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka", mood: "NGL", createdAt: new Date(Date.now() - 7200000).toISOString(), reactions: { '😂': ['u1', 'u2', 'u3', 'u4'] }, commentCount: 12 },
-    { _id: 'd3', text: "I once accidentally sent a voice note complaining about my manager to my manager's personal number.", anonName: "Panic Pixel", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Harley", mood: "Others", createdAt: new Date(Date.now() - 86400000).toISOString(), reactions: { '😮': ['u1', 'u2'], '😂': ['u3', 'u4'] }, commentCount: 23 },
-    { _id: 'd4', text: "I still have feelings for someone from three years ago. We talked every day. I never told them. I probably never will.", anonName: "Silent Heart", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha", mood: "Relationship", createdAt: new Date(Date.now() - 172800000).toISOString(), reactions: { '❤️': ['u1', 'u2', 'u3', 'u4', 'u5'], '😢': ['u6', 'u7'] }, commentCount: 31 },
-    { _id: 'd5', text: "I laugh at my friends' jokes even when I don't get them. I've been doing it so long I'm not sure what genuine laughter feels like anymore.", anonName: "Social Chameleon", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Toby", mood: "Friends", createdAt: new Date(Date.now() - 259200000).toISOString(), reactions: { '😢': ['u1', 'u2', 'u3'] }, commentCount: 8 },
-    { _id: 'd6', text: "I'm terrified of failure. But I've learned to wear confidence like a costume. Most days it works.", anonName: "Shadow Soul", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Luna", mood: "Feelings", createdAt: new Date(Date.now() - 300000).toISOString(), reactions: { '❤️': ['u1', 'u2'], '🔥': ['u3'] }, commentCount: 15 },
-    { _id: 'd7', text: "I said I was fine so many times that I started believing it. I wasn't fine.", anonName: "Quiet Storm", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=River", mood: "Mental Health", createdAt: new Date(Date.now() - 432000000).toISOString(), reactions: { '❤️': ['u1', 'u2', 'u3', 'u4', 'u5', 'u6'] }, commentCount: 44 },
-    { _id: 'd8', text: "I turned down a dream job offer because it would have meant moving away from a relationship that ended three months later anyway.", anonName: "Hindsight Fox", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ember", mood: "Career", createdAt: new Date(Date.now() - 518400000).toISOString(), reactions: { '😮': ['u1', 'u2', 'u3'] }, commentCount: 19 },
+    { _id: 'd1', text: "I've been secretly learning guitar for eight months just to surprise my best friend at their wedding.", anonName: "Melodic Ghost", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix", mood: "Personal Thoughts", createdAt: new Date(Date.now() - 3600000).toISOString(), reactions: { '❤️': ['u1','u2','u3'], '🔥': ['u4','u5'] }, commentCount: 7 },
+    { _id: 'd2', text: "I actually prefer working alone. I get so much more done. I just smile and say 'teamwork is great' in every meeting.", anonName: "Cozy Ninja", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka", mood: "NGL", createdAt: new Date(Date.now() - 7200000).toISOString(), reactions: { '😂': ['u1','u2','u3','u4'] }, commentCount: 12 },
+    { _id: 'd3', text: "I once accidentally sent a voice note complaining about my manager to my manager's personal number.", anonName: "Panic Pixel", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Harley", mood: "Others", createdAt: new Date(Date.now() - 86400000).toISOString(), reactions: { '😮': ['u1','u2'], '😂': ['u3','u4'] }, commentCount: 23 },
+    { _id: 'd4', text: "I still have feelings for someone from three years ago. We talked every day. I never told them. I probably never will.", anonName: "Silent Heart", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha", mood: "Relationship", createdAt: new Date(Date.now() - 172800000).toISOString(), reactions: { '❤️': ['u1','u2','u3','u4','u5'], '😢': ['u6','u7'] }, commentCount: 31 },
+    { _id: 'd5', text: "I laugh at my friends' jokes even when I don't get them. I've been doing it so long I'm not sure what genuine laughter feels like anymore.", anonName: "Social Chameleon", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Toby", mood: "Friends", createdAt: new Date(Date.now() - 259200000).toISOString(), reactions: { '😢': ['u1','u2','u3'] }, commentCount: 8 },
+    { _id: 'd6', text: "I'm terrified of failure. But I've learned to wear confidence like a costume. Most days it works.", anonName: "Shadow Soul", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Luna", mood: "Feelings", createdAt: new Date(Date.now() - 300000).toISOString(), reactions: { '❤️': ['u1','u2'], '🔥': ['u3'] }, commentCount: 15 },
+    { _id: 'd7', text: "I said I was fine so many times that I started believing it. I wasn't fine.", anonName: "Quiet Storm", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=River", mood: "Mental Health", createdAt: new Date(Date.now() - 432000000).toISOString(), reactions: { '❤️': ['u1','u2','u3','u4','u5','u6'] }, commentCount: 44 },
+    { _id: 'd8', text: "I turned down a dream job offer because it would have meant moving away from a relationship that ended three months later anyway.", anonName: "Hindsight Fox", anonAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ember", mood: "Career", createdAt: new Date(Date.now() - 518400000).toISOString(), reactions: { '😮': ['u1','u2','u3'] }, commentCount: 19 },
 ];
 
 const HERO_PLACEHOLDER_TEXTS = [
@@ -37,6 +41,12 @@ const AVATARS = [
 
 const ANON_NAMES = ["Silent Voyager", "Hidden Echo", "Quiet Dreamer", "Mystic Shadow", "Soft Static", "Pale Signal"];
 
+const STATS = [
+    { value: 12400, suffix: '+', label: 'confessions shared' },
+    { value: 100, suffix: '%', label: 'anonymous, always' },
+    { value: 3, suffix: 's', label: 'to post something real' },
+];
+
 function timeAgo(dateStr) {
     const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
     if (diff < 60) return 'Just now';
@@ -45,7 +55,9 @@ function timeAgo(dateStr) {
     return `${Math.floor(diff / 86400)}d ago`;
 }
 
-/* ─── Preloader ─── */
+/* ──────────────────────────────────────────
+   Preloader
+────────────────────────────────────────── */
 function Preloader({ onDone }) {
     const [count, setCount] = useState(0);
     const [leaving, setLeaving] = useState(false);
@@ -54,13 +66,13 @@ function Preloader({ onDone }) {
         const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (prefersReduced) { onDone(); return; }
 
-        const DURATION = 1100;
+        const DURATION = 1200;
         const start = performance.now();
         let assetsReady = false;
 
         const fontsReady = (document.fonts && document.fonts.ready)
             ? document.fonts.ready : Promise.resolve();
-        const pageLoaded = (document.readyState === 'complete')
+        const pageLoaded = document.readyState === 'complete'
             ? Promise.resolve()
             : new Promise(r => window.addEventListener('load', r, { once: true }));
         const cap = new Promise(r => setTimeout(r, 3500));
@@ -79,8 +91,8 @@ function Preloader({ onDone }) {
             } else {
                 setTimeout(() => {
                     setLeaving(true);
-                    setTimeout(onDone, 700);
-                }, 200);
+                    setTimeout(onDone, 680);
+                }, 180);
             }
         };
         requestAnimationFrame(tick);
@@ -88,16 +100,21 @@ function Preloader({ onDone }) {
 
     return (
         <div className={`${styles.preloader} ${leaving ? styles.preloaderOut : ''}`} aria-hidden="true">
-            <span className={styles.preloaderCount}>{String(count).padStart(2, '0')}</span>
-            <div className={styles.preloaderBar} />
+            <div className={styles.preloaderInner}>
+                <span className={styles.preloaderCount}>{String(count).padStart(2, '0')}</span>
+                <span className={styles.preloaderLabel}>Loading</span>
+            </div>
+            <div className={styles.preloaderBar}><div className={styles.preloaderBarFill} /></div>
         </div>
     );
 }
 
-/* ─── Wall Card ─── */
-function WallCard({ confession, index }) {
+/* ──────────────────────────────────────────
+   Wall Card
+────────────────────────────────────────── */
+function WallCard({ confession }) {
     return (
-        <div className={styles.wallCard} style={{ animationDelay: `${index * 0.08}s` }}>
+        <div className={styles.wallCard}>
             <div className={styles.wallCardTop}>
                 <img src={confession.anonAvatar} alt="" className={styles.wallAvatar} />
                 <div className={styles.wallMeta}>
@@ -117,7 +134,9 @@ function WallCard({ confession, index }) {
     );
 }
 
-/* ─── Confession Composer ─── */
+/* ──────────────────────────────────────────
+   Confession Composer
+────────────────────────────────────────── */
 function ConfessionComposer() {
     const [text, setText] = useState('');
     const [phase, setPhase] = useState('idle');
@@ -140,13 +159,10 @@ function ConfessionComposer() {
                 autoTypingRef.current = setTimeout(() => {
                     setCharIndex(0);
                     setPlaceholderIndex(prev => (prev + 1) % HERO_PLACEHOLDER_TEXTS.length);
-                }, 3200);
+                }, 3000);
             }
-        }, 42);
-        return () => {
-            clearInterval(typeInterval);
-            clearTimeout(autoTypingRef.current);
-        };
+        }, 40);
+        return () => { clearInterval(typeInterval); clearTimeout(autoTypingRef.current); };
     }, [phase, placeholderIndex]);
 
     const handleTextChange = (e) => {
@@ -156,21 +172,16 @@ function ConfessionComposer() {
 
     const handleAnonymize = () => {
         if (!text.trim()) return;
-        const randName = ANON_NAMES[Math.floor(Math.random() * ANON_NAMES.length)];
-        const randAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
-        setAnonName(randName);
-        setAnonAvatar(randAvatar);
+        setAnonName(ANON_NAMES[Math.floor(Math.random() * ANON_NAMES.length)]);
+        setAnonAvatar(AVATARS[Math.floor(Math.random() * AVATARS.length)]);
         setPhase('anonymized');
     };
 
-    const handleReset = () => {
-        setText('');
-        setPhase('idle');
-        setCharIndex(0);
-    };
+    const handleReset = () => { setText(''); setPhase('idle'); setCharIndex(0); };
 
-    const currentPlaceholder = HERO_PLACEHOLDER_TEXTS[placeholderIndex];
-    const displayText = phase === 'idle' ? currentPlaceholder.slice(0, charIndex) : text;
+    const displayText = phase === 'idle'
+        ? HERO_PLACEHOLDER_TEXTS[placeholderIndex].slice(0, charIndex)
+        : text;
 
     return (
         <div className={styles.composer}>
@@ -180,9 +191,7 @@ function ConfessionComposer() {
                     anonymous
                 </span>
                 {phase === 'anonymized' && (
-                    <button className={styles.composerRetry} onClick={handleReset}>
-                        Try again
-                    </button>
+                    <button className={styles.composerRetry} onClick={handleReset}>Try again</button>
                 )}
             </div>
 
@@ -209,11 +218,9 @@ function ConfessionComposer() {
                     </div>
                     <div className={styles.composerFooter}>
                         <span className={styles.composerHint}>
-                            {phase === 'idle'
-                                ? 'Click to write your own'
-                                : text.length > 0
-                                    ? `${1000 - text.length} characters left`
-                                    : 'Start typing...'}
+                            {phase === 'idle' ? 'Click to write your own'
+                                : text.length > 0 ? `${1000 - text.length} characters left`
+                                : 'Start typing...'}
                         </span>
                         <button
                             className={styles.composerSubmit}
@@ -245,7 +252,7 @@ function ConfessionComposer() {
                         </div>
                     </div>
                     <p className={styles.resultNote}>Your name is gone. That's the whole point.</p>
-                    <a href={`${API_URL}/auth/google`} className={styles.resultCta} id="composer-cta" data-magnetic data-whisper="Sign in free">
+                    <a href={`${API_URL}/auth/google`} className={styles.resultCta} id="composer-cta" data-magnetic data-whisper="Free forever">
                         <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -260,42 +267,60 @@ function ConfessionComposer() {
     );
 }
 
-/* ─── Main page animations hook ─── */
+/* ──────────────────────────────────────────
+   Animation Hook (all JS-driven effects)
+────────────────────────────────────────── */
 function usePageAnimations(pageLoaded) {
-    const wallTrackRef = useRef(null);
-
     useEffect(() => {
         if (!pageLoaded) return;
 
         const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const finePointer = window.matchMedia('(pointer: fine)').matches;
 
-        /* ── 1. Scroll reveals ── */
-        const revealTargets = document.querySelectorAll('[data-reveal]');
-        if ('IntersectionObserver' in window) {
-            const revealObserver = new IntersectionObserver((entries, obs) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-in');
-                        obs.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
-            revealTargets.forEach(el => revealObserver.observe(el));
-        } else {
-            revealTargets.forEach(el => el.classList.add('is-in'));
-        }
+        /* ── 1. Scroll reveals via IntersectionObserver ── */
+        const revealEls = document.querySelectorAll('[data-reveal]');
+        const revealObs = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-in');
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+        revealEls.forEach(el => revealObs.observe(el));
+
+        /* ── 2. Stat counters ── */
+        const statObs = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                obs.unobserve(entry.target);
+                entry.target.classList.add('is-in');
+                const el = entry.target.querySelector('[data-count]');
+                if (!el) return;
+                const target = parseInt(el.dataset.count, 10);
+                const start = performance.now();
+                const DURATION = 1600;
+                const tick = (now) => {
+                    const progress = Math.min((now - start) / DURATION, 1);
+                    const eased = 1 - Math.pow(1 - progress, 4);
+                    el.textContent = Math.round(eased * target).toLocaleString();
+                    if (progress < 1) requestAnimationFrame(tick);
+                };
+                requestAnimationFrame(tick);
+            });
+        }, { threshold: 0.5 });
+        document.querySelectorAll('[data-stat]').forEach(el => statObs.observe(el));
 
         if (prefersReduced) return;
 
-        /* ── 2. Letter cascade on hero headline ── */
+        /* ── 3. Letter cascade on hero headline ── */
         const splitLetters = (el) => {
             if (!el || el.dataset.split) return;
             el.dataset.split = '1';
-            const text = el.textContent;
+            const originalText = el.textContent;
             el.textContent = '';
             let i = 0;
-            for (const ch of text) {
+            for (const ch of originalText) {
                 const span = document.createElement('span');
                 span.className = 'ltr-cascade';
                 span.style.setProperty('--i', i++);
@@ -305,38 +330,31 @@ function usePageAnimations(pageLoaded) {
         };
 
         document.querySelectorAll('[data-letter-split]').forEach(splitLetters);
-        // trigger the cascade after a tiny delay so the DOM is painted
         setTimeout(() => {
             document.querySelectorAll('[data-letter-split]').forEach(el => {
                 el.classList.add('cascade-in');
             });
-        }, 80);
+        }, 100);
 
-        /* ── 3. Custom cursor ── */
+        /* ── 4. Custom cursor ── */
         const cursor = document.getElementById('ch-cursor');
         const cursorLabel = document.getElementById('ch-cursor-label');
 
         if (cursor && finePointer) {
-            let tx = -100, ty = -100, x = -100, y = -100;
+            let tx = -200, ty = -200, x = -200, y = -200;
             let rafActive = false;
-            let pillW = 0, pillOffY = 0, pillShiftX = 0;
+            let pillW = 0;
+            let pillOffY = 0, pillShiftX = 0;
             let whisperOn = false;
             let lastWhisperEl = null;
 
-            const applyPill = () => {
-                cursor.style.width = `${pillW}px`;
-                cursor.style.height = '30px';
-            };
-            const clearPill = () => {
-                cursor.style.width = '';
-                cursor.style.height = '';
-            };
+            const applyPill = () => { cursor.style.width = `${pillW}px`; cursor.style.height = '30px'; };
+            const clearPill = () => { cursor.style.width = ''; cursor.style.height = ''; };
 
             const renderCursor = () => {
                 x += (tx - x) * 0.2;
                 y += (ty - y) * 0.2;
-
-                const offTarget = whisperOn ? (ty < 60 ? -32 : 24) : 0;
+                const offTarget = whisperOn ? (ty < 60 ? -32 : 26) : 0;
                 pillOffY += (offTarget - pillOffY) * 0.2;
                 let shiftTarget = 0;
                 if (whisperOn) {
@@ -345,16 +363,13 @@ function usePageAnimations(pageLoaded) {
                     else if (tx > window.innerWidth - half) shiftTarget = window.innerWidth - half - tx;
                 }
                 pillShiftX += (shiftTarget - pillShiftX) * 0.2;
-
                 cursor.style.transform =
-                    `translate(${(x + pillShiftX).toFixed(1)}px, ${(y - pillOffY).toFixed(1)}px) translate(-50%, -50%)`;
-
+                    `translate(${(x + pillShiftX).toFixed(1)}px, ${(y - pillOffY).toFixed(1)}px) translate(-50%,-50%)`;
                 requestAnimationFrame(renderCursor);
             };
 
             window.addEventListener('mousemove', (e) => {
-                tx = e.clientX;
-                ty = e.clientY;
+                tx = e.clientX; ty = e.clientY;
                 if (!rafActive) {
                     rafActive = true;
                     x = tx; y = ty;
@@ -366,11 +381,8 @@ function usePageAnimations(pageLoaded) {
             document.addEventListener('mouseover', (e) => {
                 const interactive = e.target.closest('a, button, [data-cursor]');
                 let whisperEl = null;
-                if (interactive && interactive.hasAttribute('data-whisper')) {
-                    whisperEl = interactive;
-                } else if (!interactive) {
-                    whisperEl = e.target.closest('[data-whisper]');
-                }
+                if (interactive && interactive.hasAttribute('data-whisper')) whisperEl = interactive;
+                else if (!interactive) whisperEl = e.target.closest('[data-whisper]');
 
                 if (whisperEl && cursorLabel) {
                     if (whisperEl !== lastWhisperEl) {
@@ -395,42 +407,35 @@ function usePageAnimations(pageLoaded) {
             document.addEventListener('mouseenter', () => cursor.classList.add('is-visible'));
         }
 
-        /* ── 4. Magnetic buttons ── */
+        /* ── 5. Magnetic buttons ── */
         if (finePointer) {
-            const magneticEls = document.querySelectorAll('[data-magnetic]');
-            magneticEls.forEach(btn => {
+            document.querySelectorAll('[data-magnetic]').forEach(btn => {
                 btn.addEventListener('mousemove', (e) => {
                     const rect = btn.getBoundingClientRect();
                     const dx = e.clientX - (rect.left + rect.width / 2);
                     const dy = e.clientY - (rect.top + rect.height / 2);
-                    btn.style.transform = `translate(${(dx * 0.26).toFixed(1)}px, ${(dy * 0.34).toFixed(1)}px)`;
+                    btn.style.transform = `translate(${(dx * 0.28).toFixed(1)}px, ${(dy * 0.36).toFixed(1)}px)`;
                 });
-                btn.addEventListener('mouseleave', () => {
-                    btn.style.transform = '';
-                });
+                btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
             });
         }
 
-        /* ── 5. Velocity shear + JS marquee RAF loop ── */
-        const shearTargets = [
-            document.querySelector('[data-shear]'),
-            document.querySelector('[data-shear-interrupt]'),
-        ].filter(Boolean);
-
+        /* ── 6. RAF loop: velocity shear + JS marquee + scroll progress + nav state ── */
+        const shearEls = document.querySelectorAll('[data-shear]');
         const wallTrack = document.getElementById('ch-wall-track');
+        const progressEl = document.getElementById('ch-progress');
+        const navEl = document.getElementById('ch-nav');
+
         let marqueeX = 0;
-        let marqueeHalf = 0;
-        if (wallTrack && wallTrack.children.length) {
-            // half = width of one set (not doubled)
-            marqueeHalf = wallTrack.scrollWidth / 2;
-        }
+        let marqueeHalf = wallTrack ? wallTrack.scrollWidth / 2 : 0;
 
         let lastY = window.scrollY;
         let velocity = 0;
         let lastTime = performance.now();
         let skewed = false;
 
-        const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
+        const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+        const maxScroll = () => Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
 
         const loop = (now) => {
             const dt = Math.min((now - lastTime) / 1000, 0.05);
@@ -445,44 +450,59 @@ function usePageAnimations(pageLoaded) {
             const deg = clamp(velocity * 0.055, -3, 3);
             if (Math.abs(deg) > 0.05) {
                 const t = `skewY(${deg.toFixed(3)}deg)`;
-                shearTargets.forEach(el => { el.style.transform = t; });
+                shearEls.forEach(el => { el.style.transform = t; });
                 skewed = true;
             } else if (skewed) {
-                shearTargets.forEach(el => { el.style.transform = ''; });
+                shearEls.forEach(el => { el.style.transform = ''; });
                 skewed = false;
             }
 
-            /* Marquee */
+            /* JS Marquee — speed up / reverse with scroll velocity */
             if (wallTrack && marqueeHalf > 0) {
-                const speed = 36 + clamp(velocity * 60 * 0.14, -600, 600);
+                const speed = 38 + clamp(velocity * 50 * 0.15, -500, 500);
                 marqueeX = (marqueeX + speed * dt) % marqueeHalf;
                 if (marqueeX < 0) marqueeX += marqueeHalf;
                 wallTrack.style.transform = `translate3d(${(-marqueeX).toFixed(1)}px,0,0)`;
             }
 
+            /* Scroll progress bar */
+            if (progressEl) {
+                progressEl.style.transform = `scaleX(${clamp(y / maxScroll(), 0, 1).toFixed(4)})`;
+            }
+
+            /* Nav scroll state */
+            if (navEl) navEl.classList.toggle('nav-scrolled', y > 60);
+
             requestAnimationFrame(loop);
         };
 
-        requestAnimationFrame(loop);
+        const rafId = requestAnimationFrame(loop);
 
-        /* Update marqueeHalf on resize */
         const onResize = () => {
             if (wallTrack) marqueeHalf = wallTrack.scrollWidth / 2;
         };
         window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
 
+        return () => {
+            cancelAnimationFrame(rafId);
+            window.removeEventListener('resize', onResize);
+            revealObs.disconnect();
+            statObs.disconnect();
+        };
     }, [pageLoaded]);
 }
 
-/* ─── Main LandingPage ─── */
+/* ──────────────────────────────────────────
+   Main Page
+────────────────────────────────────────── */
 export default function LandingPage() {
     const [loaded, setLoaded] = useState(false);
     const doubled = [...REPRESENTATIVE_CONFESSIONS, ...REPRESENTATIVE_CONFESSIONS];
+    const handleDone = useCallback(() => setLoaded(true), []);
 
     usePageAnimations(loaded);
 
-    // Easter egg: Konami code
+    // Konami easter egg
     useEffect(() => {
         const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
         let seq = [];
@@ -506,53 +526,73 @@ export default function LandingPage() {
         <div className={styles.page}>
 
             {/* ─── PRELOADER ─── */}
-            {!loaded && <Preloader onDone={() => setLoaded(true)} />}
+            {!loaded && <Preloader onDone={handleDone} />}
+
+            {/* ─── SCROLL PROGRESS ─── */}
+            <div id="ch-progress" aria-hidden="true" />
 
             {/* ─── CUSTOM CURSOR ─── */}
-            <div id="ch-cursor" className={styles.cursor} aria-hidden="true">
-                <span id="ch-cursor-label" className={styles.cursorLabel} />
+            <div id="ch-cursor" aria-hidden="true">
+                <span id="ch-cursor-label" />
             </div>
 
             {/* ─── NAV ─── */}
-            <nav className={styles.nav}>
+            <nav id="ch-nav" className={styles.nav}>
                 <span className={styles.navBrand}>ConfessHere</span>
-                <a
-                    href={`${API_URL}/auth/google`}
-                    className={styles.navCta}
-                    id="nav-cta"
-                    data-magnetic
-                    data-whisper="It's free"
-                >
+                <a href={`${API_URL}/auth/google`} className={styles.navCta} id="nav-cta" data-magnetic data-whisper="It's free">
                     Start Confessing
                 </a>
             </nav>
 
             {/* ─── HERO ─── */}
             <section className={styles.hero} id="hero">
+                {/* Ember particles */}
+                <div className={styles.particles} aria-hidden="true">
+                    {[...Array(8)].map((_, i) => (
+                        <span key={i} className={styles.particle} style={{ '--pi': i }} />
+                    ))}
+                </div>
+
                 <div className={styles.heroInner} data-shear>
-                    <h1
-                        className={styles.heroHeadline}
-                        data-letter-split
-                        data-reveal
-                    >
-                        Say what you can't say anywhere else.
+                    <div className={styles.heroBadge} data-reveal>
+                        <span className={styles.heroBadgeDot} />
+                        100% anonymous · No account required to read
+                    </div>
+                    <h1 className={styles.heroHeadline} data-letter-split>
+                        Say what you&apos;ve never said aloud.
                     </h1>
-                    <p className={styles.heroSub} data-reveal>
+                    <p className={styles.heroSub} data-reveal data-reveal-delay="1">
                         Write what's on your mind. Share it without your name attached.
+                        No judgment. No trace.
                     </p>
-                    <ConfessionComposer />
-                    <p className={styles.heroDisclaimer} data-reveal>
+                    <div data-reveal data-reveal-delay="2" style={{ width: '100%' }}>
+                        <ConfessionComposer />
+                    </div>
+                    <p className={styles.heroDisclaimer} data-reveal data-reveal-delay="3">
                         Sign in with Google · Your real name never appears on the platform
                     </p>
                 </div>
             </section>
 
+            {/* ─── STATS ─── */}
+            <section className={styles.statsRow}>
+                {STATS.map((stat, i) => (
+                    <div key={stat.label} className={styles.statItem} data-stat>
+                        <div className={styles.statNum}>
+                            <span data-count={stat.value}>0</span>
+                            <span>{stat.suffix}</span>
+                        </div>
+                        <div className={styles.statLabel}>{stat.label}</div>
+                    </div>
+                ))}
+            </section>
+
             {/* ─── EDITORIAL INTERRUPTION ─── */}
             <section className={styles.interrupt} aria-label="Product philosophy">
-                <div className={styles.interruptInner} data-shear-interrupt>
-                    <p className={styles.interruptLine} data-reveal>No profile to maintain.</p>
-                    <p className={styles.interruptLine} data-reveal>No followers to impress.</p>
-                    <p className={`${styles.interruptLine} ${styles.interruptLineAccent}`} data-reveal>
+                <div className={styles.interruptInner} data-shear>
+                    <p className={styles.interruptLine} data-reveal data-reveal-delay="0">No profile to maintain.</p>
+                    <p className={styles.interruptLine} data-reveal data-reveal-delay="1">No followers to impress.</p>
+                    <p className={`${styles.interruptLine} ${styles.interruptLineAccent}`} data-reveal data-reveal-delay="2">
                         Just something you needed to say.
                     </p>
                 </div>
@@ -560,13 +600,14 @@ export default function LandingPage() {
 
             {/* ─── CONFESSION WALL ─── */}
             <section className={styles.wall}>
-                <div className={styles.wallLabel}>
-                    Representative examples — real posts look exactly like these
+                <div className={styles.wallHeader} data-reveal>
+                    <span className={styles.wallTag}>Live wall</span>
+                    <span className={styles.wallLabel}>Representative examples — real posts look exactly like these</span>
                 </div>
                 <div className={styles.wallScroll}>
                     <div className={styles.wallTrack} id="ch-wall-track">
                         {doubled.map((c, i) => (
-                            <WallCard key={`${c._id}-${i}`} confession={c} index={i} />
+                            <WallCard key={`${c._id}-${i}`} confession={c} />
                         ))}
                     </div>
                 </div>
@@ -581,7 +622,7 @@ export default function LandingPage() {
                         "Some thoughts are hard to say because saying them publicly means
                         attaching your name to them."
                     </div>
-                    <div className={styles.whyBody} data-reveal>
+                    <div className={styles.whyBody} data-reveal data-reveal-delay="1">
                         <p>
                             Most places you share something, you become the story.
                             Your name, your face, your history — they follow the words.
@@ -599,6 +640,26 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* ─── HOW IT WORKS ─── */}
+            <section className={styles.howItWorks}>
+                <div className={styles.howInner}>
+                    <h2 className={styles.howHeadline} data-reveal>Simple. Private. Real.</h2>
+                    <div className={styles.howSteps}>
+                        {[
+                            { num: '01', title: 'Write freely', body: 'Type whatever is on your mind. No character limits, no pressure.' },
+                            { num: '02', title: 'We anonymize you', body: 'We assign you a random persona. Your identity is never stored with your confession.' },
+                            { num: '03', title: 'The world reads it', body: 'Your confession joins the wall. People react, relate, and understand — without knowing it was you.' },
+                        ].map((step, i) => (
+                            <div key={step.num} className={styles.howStep} data-reveal style={{ '--reveal-i': i }}>
+                                <span className={styles.howNum}>{step.num}</span>
+                                <h3 className={styles.howTitle}>{step.title}</h3>
+                                <p className={styles.howBody}>{step.body}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* ─── FINAL CTA ─── */}
             <section className={styles.cta}>
                 <div className={styles.ctaInner} data-reveal>
@@ -608,13 +669,7 @@ export default function LandingPage() {
                     <p className={styles.ctaSub}>
                         Write what's on your mind.<br />Your name stays out of it.
                     </p>
-                    <a
-                        href={`${API_URL}/auth/google`}
-                        className={styles.ctaBtn}
-                        id="footer-cta"
-                        data-magnetic
-                        data-whisper="Anonymous · Free"
-                    >
+                    <a href={`${API_URL}/auth/google`} className={styles.ctaBtn} id="footer-cta" data-magnetic data-whisper="Anonymous · Free">
                         <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -624,7 +679,7 @@ export default function LandingPage() {
                         Continue with Google
                     </a>
                     <p className={styles.ctaDisclaimer}>
-                        Google is used for authentication only. Your real identity never shows on the platform.
+                        Google is used for authentication only. Your real identity never shows.
                     </p>
                 </div>
             </section>

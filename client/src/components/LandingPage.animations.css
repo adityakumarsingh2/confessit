@@ -13,6 +13,8 @@
   transition:
     opacity 0.72s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     transform 0.72s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Support both explicit delay attr and inline --reveal-i custom prop */
+  transition-delay: calc(var(--reveal-i, 0) * 0.12s);
 }
 [data-reveal].is-in {
   opacity: 1;
@@ -21,6 +23,7 @@
 [data-reveal-delay="1"] { transition-delay: 0.12s; }
 [data-reveal-delay="2"] { transition-delay: 0.22s; }
 [data-reveal-delay="3"] { transition-delay: 0.34s; }
+
 
 /* ════════════════════════════════════════════
    LETTER CASCADE
