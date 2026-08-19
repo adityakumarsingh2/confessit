@@ -184,16 +184,20 @@ export default function App() {
         }
     };
 
+    const isLandingView = !user && currentView === 'feed' && !sharedConfession;
+
     return (
         <div className={styles.app}>
-            <Navbar
-                user={user}
-                onSearch={(q) => refresh({ search: q })}
-                unreadCount={unreadCount}
-                onNavigate={setCurrentView}
-            />
+            {!isLandingView && (
+                <Navbar
+                    user={user}
+                    onSearch={(q) => refresh({ search: q })}
+                    unreadCount={unreadCount}
+                    onNavigate={setCurrentView}
+                />
+            )}
 
-            {!user && currentView === 'feed' && !sharedConfession ? (
+            {isLandingView ? (
                 <LandingPage />
             ) : (
                 <main className={styles.main}>
