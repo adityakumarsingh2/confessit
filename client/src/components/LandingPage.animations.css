@@ -1,41 +1,83 @@
 /*
- * ConfessHere — Global Animation Classes
- * All selectors here are manipulated by JS via classList.add/remove.
- * This MUST be a plain CSS file (not a CSS Module) so class names are not scoped.
+ * ConfessHere — Global Animation Classes (plain CSS, NOT a module)
+ * All selectors here are toggled by JS via classList.add/remove.
+ * MUST remain a plain CSS file so class names are never scoped.
  */
 
 /* ════════════════════════════════════════════
-   SCROLL REVEALS
+   SCROLL REVEALS  [data-reveal]
    ════════════════════════════════════════════ */
 [data-reveal] {
   opacity: 0;
   transform: translateY(28px);
   transition:
-    opacity 0.72s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 0.72s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  /* Support both explicit delay attr and inline --reveal-i custom prop */
+    opacity  0.78s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.78s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   transition-delay: calc(var(--reveal-i, 0) * 0.12s);
 }
+
 [data-reveal].is-in {
   opacity: 1;
   transform: translateY(0);
 }
-[data-reveal-delay="1"] { transition-delay: 0.12s; }
-[data-reveal-delay="2"] { transition-delay: 0.22s; }
-[data-reveal-delay="3"] { transition-delay: 0.34s; }
 
+/* Explicit stagger helpers */
+[data-reveal-delay="1"] { transition-delay: 0.13s !important; }
+[data-reveal-delay="2"] { transition-delay: 0.24s !important; }
+[data-reveal-delay="3"] { transition-delay: 0.36s !important; }
 
 /* ════════════════════════════════════════════
-   LETTER CASCADE
+   HERO CLIP-PATH LINE REVEAL   [data-hero-line]
+   (The .heroLineInner slides up from container overflow:hidden)
+   ════════════════════════════════════════════ */
+/* CSS-only fallback: if JS is slow, this fires from the is-in class */
+[data-hero-line].is-in .heroLineInner {
+  transform: translateY(0) !important;
+}
+
+/* ════════════════════════════════════════════
+   STAT ITEMS  [data-stat]
+   ════════════════════════════════════════════ */
+[data-stat] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity  0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition-delay: calc(var(--si, 0) * 0.14s);
+}
+[data-stat].is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ════════════════════════════════════════════
+   TRUST ITEMS  [data-trust-item]
+   ════════════════════════════════════════════ */
+[data-trust-item] {
+  opacity: 0;
+  transform: translateX(-18px);
+  transition:
+    opacity  0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition-delay: calc(var(--ti, 0) * 0.12s);
+}
+[data-trust-item].is-in {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ════════════════════════════════════════════
+   LETTER CASCADE  .ltr-cascade
    ════════════════════════════════════════════ */
 .ltr-cascade {
   display: inline-block;
   opacity: 0;
   transform: translateY(0.45em);
   transition:
-    opacity 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity  0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transition-delay: calc(var(--i) * 22ms + 280ms);
+  transition-delay: calc(var(--i) * 20ms + 320ms);
 }
 [data-letter-split].cascade-in .ltr-cascade {
   opacity: 1;
@@ -43,23 +85,23 @@
 }
 
 /* ════════════════════════════════════════════
-   CUSTOM CURSOR
+   CUSTOM CURSOR   #ch-cursor
    ════════════════════════════════════════════ */
 #ch-cursor {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 9998;
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 999px;
   background: rgba(240, 237, 232, 0.92);
   pointer-events: none;
   opacity: 0;
   transition:
-    opacity 0.3s,
-    width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
-    height 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity   0.3s,
+    width     0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    height    0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
     background 0.22s;
   will-change: transform;
   display: flex;
@@ -68,37 +110,41 @@
   overflow: hidden;
   mix-blend-mode: difference;
 }
+
 #ch-cursor.is-visible  { opacity: 1; }
+
 #ch-cursor.is-link {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   background: rgba(240, 237, 232, 0.08);
-  border: 1px solid rgba(240, 237, 232, 0.3);
+  border: 1px solid rgba(240, 237, 232, 0.28);
   mix-blend-mode: normal;
 }
+
 #ch-cursor.is-whisper {
   background: #f0ede8;
   mix-blend-mode: normal;
-  padding: 0 16px;
+  padding: 0 15px;
 }
 
 #ch-cursor-label {
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   font-weight: 700;
   font-family: 'Inter', sans-serif;
-  color: #0a0a0a;
+  color: #080808;
   white-space: nowrap;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   opacity: 0;
   transition: opacity 0.18s;
   pointer-events: none;
   user-select: none;
 }
+
 #ch-cursor.is-whisper #ch-cursor-label { opacity: 1; }
 
 /* ════════════════════════════════════════════
-   PROGRESS BAR
+   SCROLL PROGRESS BAR  #ch-progress
    ════════════════════════════════════════════ */
 #ch-progress {
   position: fixed;
@@ -110,40 +156,28 @@
   pointer-events: none;
   transform-origin: left;
   transform: scaleX(0);
-  background: rgba(255, 255, 255, 0.18);
+  background: linear-gradient(to right, #d45a1a, rgba(212, 90, 26, 0.4));
   transition: transform 0.06s linear;
 }
 
 /* ════════════════════════════════════════════
-   NAV SCROLL STATE
+   NAV SCROLL STATE  #ch-nav.nav-scrolled
    ════════════════════════════════════════════ */
 #ch-nav.nav-scrolled {
-  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
-  background: rgba(10, 10, 10, 0.98) !important;
+  background: rgba(8, 8, 8, 0.97) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
-
-/* ════════════════════════════════════════════
-   STAT COUNTERS
-   ════════════════════════════════════════════ */
-[data-stat] {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 0.6s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 0.6s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-[data-stat].is-in { opacity: 1; transform: translateY(0); }
 
 /* ════════════════════════════════════════════
    TOAST
    ════════════════════════════════════════════ */
 @keyframes toastSlide {
-  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  from { opacity: 0; transform: translateX(-50%) translateY(14px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* ════════════════════════════════════════════
-   TOUCH: HIDE CURSOR
+   TOUCH: hide custom cursor
    ════════════════════════════════════════════ */
 @media (hover: none) {
   #ch-cursor { display: none; }
