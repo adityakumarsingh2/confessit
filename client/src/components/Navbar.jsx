@@ -18,7 +18,7 @@ export default function Navbar({ user, onSearch, unreadCount, onNavigate }) {
                     </div>
                     <div className={styles.titleWrapper}>
                         <span className={styles.titleConfess}>Confess</span>
-                        <span className={styles.titleIt}>It</span>
+                        <span className={styles.titleIt}>Here</span>
                     </div>
                 </div>
 
