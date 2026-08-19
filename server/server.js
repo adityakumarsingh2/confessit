@@ -72,6 +72,23 @@ app.get('/auth/logout', (req, res, next) => {
 });
 
 // --- User Activity & Auth Routes ---
+app.get('/api/stats', async (req, res) => {
+    try {
+        const confessions = await Confession.countDocuments({
+            $or: [
+                { recipientId: null },
+                { isReplied: true }
+            ]
+        });
+        const comments = await Comment.countDocuments({});
+        const users = await User.countDocuments({});
+
+        res.json({ confessions, comments, users });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 app.get('/api/user', async (req, res) => {
     if (!req.user) return res.json(null);
     try {

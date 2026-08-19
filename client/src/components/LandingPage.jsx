@@ -48,12 +48,6 @@ const AVATARS = [
 
 const ANON_NAMES = ["Silent Voyager","Hidden Echo","Quiet Dreamer","Mystic Shadow","Soft Static","Pale Signal","Ghost Ink","Nameless"];
 
-const STATS = [
-    { value: 12400, suffix: '+', label: 'confessions shared', desc: '…and counting' },
-    { value: 100, suffix: '%', label: 'anonymous', desc: 'your name never appears' },
-    { value: 3, suffix: 's', label: 'to post', desc: 'write · anonymize · share' },
-];
-
 const CATEGORIES = [
     { Icon: Heart,          label: 'Relationships', sub: "Feelings you can't speak",          color: '#e85d7a' },
     { Icon: Flame,          label: 'Hot Takes',     sub: 'Thoughts too honest for dinner',     color: '#f97316' },
@@ -344,28 +338,6 @@ function usePageAnimations(pageLoaded) {
             document.querySelectorAll('[data-hero-line]').forEach(el => el.classList.add('is-in'));
         }, 100);
 
-        /* 3. Stat counters */
-        const statObs = new IntersectionObserver((entries, obs) => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                obs.unobserve(entry.target);
-                entry.target.classList.add('is-in');
-                const numEl = entry.target.querySelector('[data-count]');
-                if (!numEl) return;
-                const target = parseInt(numEl.dataset.count, 10);
-                const dur = 1800;
-                const start = performance.now();
-                const tick = (now) => {
-                    const t = Math.min((now - start) / dur, 1);
-                    const eased = 1 - Math.pow(1 - t, 4);
-                    numEl.textContent = Math.round(eased * target).toLocaleString();
-                    if (t < 1) requestAnimationFrame(tick);
-                };
-                requestAnimationFrame(tick);
-            });
-        }, { threshold: 0.5 });
-        document.querySelectorAll('[data-stat]').forEach(el => statObs.observe(el));
-
         /* 4. Trust checklist items */
         const trustObs = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
@@ -531,8 +503,20 @@ function usePageAnimations(pageLoaded) {
 /* ─── Main Page ─── */
 export default function LandingPage({ onExplore }) {
     const [loaded, setLoaded] = useState(false);
+    const [stats, setStats] = useState({ confessions: 0, comments: 0, users: 0 });
     const handleDone = useCallback(() => setLoaded(true), []);
     const doubled = [...WALL_CONFESSIONS, ...WALL_CONFESSIONS];
+
+    useEffect(() => {
+        fetch(`${API_URL}/api/stats`)
+            .then((res) => res.json())
+            .then((data) => {
+                if (data && typeof data.confessions === 'number') {
+                    setStats(data);
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     usePageAnimations(loaded);
 
@@ -670,18 +654,32 @@ export default function LandingPage({ onExplore }) {
                 </div>
             </div>
 
-            {/* ─── STATS ─── */}
+            {/* ─── REAL LIVE STATS ─── */}
             <section className={styles.statsRow}>
-                {STATS.map((s, i) => (
-                    <div key={s.label} className={styles.statItem} data-stat style={{ '--si': i }}>
-                        <div className={styles.statNum}>
-                            <span data-count={s.value}>0</span>
-                            <span className={styles.statSuffix}>{s.suffix}</span>
-                        </div>
-                        <div className={styles.statLabel}>{s.label}</div>
-                        <div className={styles.statDesc}>{s.desc}</div>
+                <div className={styles.statItem} data-reveal style={{ '--si': 0 }}>
+                    <div className={styles.statNum}>
+                        <span>{stats.confessions}</span>
+                        <span className={styles.statSuffix}>+</span>
                     </div>
-                ))}
+                    <div className={styles.statLabel}>Live Secrets Shared</div>
+                    <div className={styles.statDesc}>Real-time public confessions</div>
+                </div>
+                <div className={styles.statItem} data-reveal style={{ '--si': 1 }}>
+                    <div className={styles.statNum}>
+                        <span>{stats.comments}</span>
+                        <span className={styles.statSuffix}>+</span>
+                    </div>
+                    <div className={styles.statLabel}>Community Replies</div>
+                    <div className={styles.statDesc}>Encouragement & support</div>
+                </div>
+                <div className={styles.statItem} data-reveal style={{ '--si': 2 }}>
+                    <div className={styles.statNum}>
+                        <span>100</span>
+                        <span className={styles.statSuffix}>%</span>
+                    </div>
+                    <div className={styles.statLabel}>Zero Trace Anonymous</div>
+                    <div className={styles.statDesc}>No tracking · Encrypted IDs</div>
+                </div>
             </section>
 
             {/* ─── CONFESSION WALL ─── */}
