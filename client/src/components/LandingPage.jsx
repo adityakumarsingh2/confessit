@@ -493,7 +493,6 @@ function usePageAnimations(pageLoaded) {
 
         return () => {
             revealObs.disconnect();
-            statObs.disconnect();
             trustObs.disconnect();
             window.removeEventListener('resize', onResize);
         };

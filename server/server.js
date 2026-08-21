@@ -15,9 +15,31 @@ const Comment = require('./models/Comment');
 
 const app = express();
 
-if (!process.env.CLIENT_ORIGIN) {
-    console.warn(' [WARNING] CLIENT_ORIGIN is not set. Redirects will default to localhost.');
-}
+const envOrigins = (process.env.CLIENT_ORIGIN || '')
+    .split(',')
+    .map(o => o.trim())
+    .filter(Boolean);
+
+const defaultOrigins = [
+    'https://www.confesshere.online',
+    'https://confesshere.online',
+    'https://justconfessit.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
+
+const allowedOrigins = Array.from(new Set([...envOrigins, ...defaultOrigins]));
+
+const getRedirectOrigin = (req) => {
+    const originHeader = req?.headers?.origin || req?.headers?.referer;
+    if (originHeader) {
+        try {
+            const parsed = new URL(originHeader).origin;
+            if (allowedOrigins.includes(parsed)) return parsed;
+        } catch (e) {}
+    }
+    return envOrigins[0] || 'https://www.confesshere.online';
+};
 
 // Trust proxy (required for session cookies over proxy)
 app.set('trust proxy', 1);
@@ -29,7 +51,14 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/confession_
 
 // --- Middleware (order matters!) ---
 app.use(cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin) || origin.endsWith('.confesshere.online') || origin.endsWith('.vercel.app')) {
+            return callback(null, true);
+        }
+        console.warn(`[CORS] Request from origin ${origin} allowed as fallback.`);
+        return callback(null, true);
+    },
     credentials: true
 }));
 app.use(express.json());
@@ -58,16 +87,18 @@ const isAuth = (req, res, next) => {
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: (process.env.CLIENT_ORIGIN || 'http://localhost:5173') + '/?error=auth_failed' }),
+    (req, res, next) => {
+        passport.authenticate('google', { failureRedirect: getRedirectOrigin(req) + '/?error=auth_failed' })(req, res, next);
+    },
     (req, res) => {
-        res.redirect(process.env.CLIENT_ORIGIN || 'http://localhost:5173');
+        res.redirect(getRedirectOrigin(req));
     }
 );
 
 app.get('/auth/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) return next(err);
-        res.redirect(process.env.CLIENT_ORIGIN || 'http://localhost:5173');
+        res.redirect(getRedirectOrigin(req));
     });
 });
 
