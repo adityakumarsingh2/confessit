@@ -1,98 +1,99 @@
-# 🕵️ Anonymous Confession Wall (MERN Stack)
+# 🕵️ ConfessHere - Anonymous Confession Platform (MERN Stack)
 
-A complete full-stack anonymous confession platform built using the MERN stack. Users can log in with Google, post confessions anonymously, comment, react, and explore trending confessions — all while maintaining complete privacy.
+**ConfessHere** is a modern, full-stack anonymous confession platform built with the MERN stack. It offers a safe space where users can log in via Google OAuth, share secrets anonymously, receive direct NGL-style messages, react with floating emoji bursts, and explore trending confessions — all with complete identity protection.
 
-[![Live Concept](https://img.shields.io/badge/Live%20Demo-justconfessit.vercel.app-blue?style=for-the-badge)](https://justconfessit.vercel.app)
+[![Live Website](https://img.shields.io/badge/Live%20Website-confesshere.online-blue?style=for-the-badge&logo=vercel)](https://www.confesshere.online)
 
 ---
 
 ## 📁 Repository Structure
 
-This project is organized as a monorepo containing the frontend client and the backend server:
-
 ```
 confessit/
-├── client/          # Frontend client application (React + Vite)
-│   ├── public/      # Static assets
-│   ├── src/         # React source files (components, styles, app logical files)
-│   └── package.json # Client-specific dependencies and scripts
-└── server/          # Backend server API (Node.js + Express)
-    ├── models/      # MongoDB Schema definitions (Mongoose)
-    ├── config/      # Configuration files (Passport setup, database connection)
-    ├── server.js    # Express server entry point
-    └── package.json # Server-specific dependencies and scripts
+├── client/          # Frontend React + Vite application
+│   ├── public/      # Static assets & icons
+│   ├── src/         # UI Components, Canvas animations, CSS Modules
+│   └── package.json # Client dependencies & scripts
+└── server/          # Backend Node.js + Express API
+    ├── models/      # Mongoose Schemas (Confession, User, Activity)
+    ├── config/      # Passport Google OAuth & DB connection
+    ├── server.js    # Express API entry point
+    └── package.json # Server dependencies & scripts
 ```
 
 ---
 
-## ✨ Features
+## ✨ Features & User Experience
 
-- **🔐 Secure Google Authentication:** Authenticate securely using Google OAuth 2.0.
-- **🎭 Complete Anonymity:** Google identity is kept hidden from public view. User display names and avatars are generated dynamically using random name and avatar APIs.
-- **📝 Confessions & Timeline:** Create and view anonymous confessions in a real-time reactive global feed.
-- **💬 Interactive Comments:** Discuss and engage with confessions anonymously using comments.
-- **❤️ Real-time Reactions:** React (like/love/etc.) to posts instantly.
-- **🔥 Trending Algorithm:** Display trending confessions automatically ranked based on active engagement (likes & comments).
+- **🔐 Google OAuth Authentication:** Seamless login while guaranteeing complete anonymity. Google IDs and emails are never exposed or stored on public posts.
+- **🎭 Dynamically Generated Identities:** Anonymous usernames (e.g., *Mystic Panda*) and avatars are dynamically assigned and can be regenerated anytime with a 360° spin effect.
+- **🎉 Confetti Celebrations:** Festive particle canvas explosion upon posting confessions.
+- **✨ Floating Emoji Bursts:** Interactive particle burst animations when reacting with emojis (❤️, 😂, 😢, 🔥, 😮).
+- **📩 Anonymous Inbox & Recipient Replies:** NGL-style custom recipient links allowing users to send direct secrets and recipients to reply privately.
+- **🔖 Bookmarks & Drafts:** Save favorite secrets or draft confessions offline before sharing.
+- **⏱️ Glassmorphism Toasts:** Smooth notification popups with animated countdown progress timers.
+- **🔥 Engagement-driven Trends:** Real-time trending algorithm ranking posts based on live reactions and comment activity.
+- **🏷️ Mood Tag Filtering:** Category tags (#Relationship, #Study, #College, #Feelings) with interactive search and filtering.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Frontend:** React.js, Vite, Axios, Tailwind CSS / Vanilla CSS, Context API
+- **Frontend:** React 18, Vite, Lucide React Icons, Canvas Confetti, Vanilla CSS Glassmorphism
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB Atlas, Mongoose ODM
-- **Authentication:** Passport.js, Google OAuth 2.0 Strategy
+- **Authentication:** Passport.js, Google OAuth 2.0 Strategy, Express Sessions
 
 ---
 
 ## 🚀 Getting Started
 
-Follow these steps to run the application locally.
-
-### 1. Clone the repository
+### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/confessit.git
+git clone https://github.com/adityakumarsingh2/confessit.git
 cd confessit
 ```
 
 ### 2. Configure Backend Environment
-Create a `.env` file inside the `server/` directory and populate it with your credentials:
+Create a `.env` file inside `server/`:
 ```env
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 SESSION_SECRET=your_session_secret_key
+CLIENT_URL=http://localhost:5173
 ```
 
-### 3. Setup and Run the Server
+### 3. Start the Server
 ```bash
 cd server
 npm install
 npm start
 ```
-The server will start running on the port configured in `.env` (default is `http://localhost:5000`).
 
-### 4. Setup and Run the Client
+### 4. Start the Client
 In a new terminal window:
 ```bash
 cd client
 npm install
 npm run dev
 ```
-Open a browser and navigate to the local address displayed (usually `http://localhost:5173`).
+
+Visit `http://localhost:5173` in your browser.
 
 ---
 
-## 🔒 Privacy & Architecture Design
+## 🔒 Privacy Architecture Design
 
-Google integration is strictly restricted to secure authentication only. The application decouples user Google credentials from public profiles entirely.
-- Email and Google IDs are never returned to client-side API requests.
-- Random identities are randomly generated on the backend upon first registration.
+Google integration is strictly restricted to secure authentication. The platform completely decouples user Google credentials from public profiles:
+- User email addresses and Google IDs are omitted from all public API endpoints.
+- Anonymous personas and avatars are generated server-side upon initial sign-up and stored independently.
 
 ---
 
 ## 👨‍💻 Author
 
-- **Aditya Kumar Singh** - *B.Tech CSE, Full Stack Developer*
+- **Aditya Kumar Singh** - *Full Stack Developer*
 - Website: [adityakumarsingh.tech](https://adityakumarsingh.tech)
+- Live App: [confesshere.online](https://www.confesshere.online)
