@@ -111,11 +111,43 @@ export default function ConfessionCard({ confession, user, activity, onReact, on
         await onVote(confession._id, optionIndex);
     };
 
-    const handleReaction = (emoji) => {
+    const [bursts, setBursts] = useState([]);
+    const [animateBookmark, setAnimateBookmark] = useState(false);
+
+    const triggerBurst = (emoji, e) => {
+        if (!e) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const id = Date.now() + Math.random();
+        const particles = Array.from({ length: 5 }, (_, i) => ({
+            id: `${id}-${i}`,
+            emoji,
+            left: rect.left + rect.width / 2 + (Math.random() * 20 - 10),
+            top: rect.top + (Math.random() * 10 - 5),
+            dx: `${(Math.random() - 0.5) * 50}px`,
+            dy: `${-30 - Math.random() * 35}px`,
+            dr: `${(Math.random() - 0.5) * 40}deg`,
+        }));
+        setBursts(prev => [...prev, ...particles]);
+        setTimeout(() => {
+            setBursts(prev => prev.filter(p => !particles.some(np => np.id === p.id)));
+        }, 850);
+    };
+
+    const handleReaction = (emoji, e) => {
         if (!user) return;
         const count = getUserReactionsCount(emoji);
-        if (count < 10) onReact(confession._id, emoji);
+        if (count < 10) {
+            onReact(confession._id, emoji);
+            if (e) triggerBurst(emoji, e);
+        }
         setShowEmojiPicker(false);
+    };
+
+    const handleBookmarkClick = () => {
+        if (!user) return;
+        setAnimateBookmark(true);
+        setTimeout(() => setAnimateBookmark(false), 450);
+        onBookmark(confession._id);
     };
 
     const handleShare = () => {
@@ -258,6 +290,24 @@ export default function ConfessionCard({ confession, user, activity, onReact, on
                 </div>
             )}
 
+            {/* Floating Emoji Particle Bursts */}
+            {bursts.map(b => (
+                <span
+                    key={b.id}
+                    className="emoji-burst"
+                    style={{
+                        position: 'fixed',
+                        left: `${b.left}px`,
+                        top: `${b.top}px`,
+                        '--dx': b.dx,
+                        '--dy': b.dy,
+                        '--dr': b.dr,
+                    }}
+                >
+                    {b.emoji}
+                </span>
+            ))}
+
             {/* ─── Footer ─── */}
             {!isInbox && (
                 <div className={styles.footer}>
@@ -268,7 +318,7 @@ export default function ConfessionCard({ confession, user, activity, onReact, on
                                     key={emoji}
                                     type="button"
                                     className={`${styles.miniReact} ${currentReaction === emoji ? styles.activeReact : ''} ${getUserReactionsCount(emoji) >= 10 ? styles.maxed : ''}`}
-                                    onClick={() => handleReaction(emoji)}
+                                    onClick={(e) => handleReaction(emoji, e)}
                                     disabled={!user}
                                     title={getUserReactionsCount(emoji) > 0 ? `${getUserReactionsCount(emoji)}/10 likes` : 'React'}
                                 >
@@ -295,7 +345,7 @@ export default function ConfessionCard({ confession, user, activity, onReact, on
                                             <button
                                                 key={emoji}
                                                 type="button"
-                                                onClick={() => handleReaction(emoji)}
+                                                onClick={(e) => handleReaction(emoji, e)}
                                                 className={styles.pickerEmoji}
                                             >
                                                 {emoji}
@@ -341,9 +391,9 @@ export default function ConfessionCard({ confession, user, activity, onReact, on
                         )}
                         {/* Bookmark */}
                         <button
-                            className={`${styles.actionBtn}`}
+                            className={`${styles.actionBtn} ${animateBookmark ? 'icon-bounce' : ''}`}
                             type="button"
-                            onClick={() => onBookmark(confession._id)}
+                            onClick={handleBookmarkClick}
                             disabled={!user}
                             title="Bookmark"
                             style={{ color: isBookmarked ? 'var(--warning)' : undefined }}

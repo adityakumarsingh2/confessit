@@ -8,6 +8,7 @@ import ConfessionForm from './components/ConfessionForm';
 import ConfessionList from './components/ConfessionList';
 import PublicProfile from './components/PublicProfile';
 import Toast from './components/Toast';
+import Confetti from './components/Confetti';
 import LandingPage from './components/LandingPage';
 import styles from './App.module.css';
 
@@ -42,6 +43,7 @@ export default function App() {
     const [toasts, setToasts] = useState([]);
     const [sharedConfession, setSharedConfession] = useState(null);
     const [sendToId, setSendToId] = useState(null);
+    const [showConfetti, setShowConfetti] = useState(false);
     const [inboxMessages, setInboxMessages] = useState([]);
 
     // Automatically exit landing view when user logs in or URL specifies feed/error
@@ -142,6 +144,7 @@ export default function App() {
     const handlePost = async (payload) => {
         try {
             await postConfession(payload);
+            setShowConfetti(true);
             addToast('Secret shared! 🚀');
         } catch (e) {
             addToast(e.message, 'error');
@@ -297,6 +300,9 @@ export default function App() {
                 </div>
             </main>
             )}
+
+            {/* Confetti Celebration */}
+            <Confetti active={showConfetti} onDone={() => setShowConfetti(false)} />
 
             {/* Toasts */}
             <Toast toasts={toasts} remove={removeToast} />

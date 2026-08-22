@@ -1,7 +1,11 @@
-import { Home, Inbox, FileText, Bookmark, Archive, RefreshCw, Copy, UserCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { Home, Inbox, FileText, Bookmark, Archive, RefreshCw, Copy, Check, UserCircle2 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
 export default function Sidebar({ user, activity, unreadCount, currentView, onNavigate, onRegenerate }) {
+    const [isSpinning, setIsSpinning] = useState(false);
+    const [copied, setCopied] = useState(false);
+
     if (!user) return (
         <aside className={`${styles.sidebar} sticky-top`}>
             <div className={`glass ${styles.profileCard}`} style={{ textAlign: 'center', padding: '3rem 1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -26,9 +30,14 @@ export default function Sidebar({ user, activity, unreadCount, currentView, onNa
 
     const handleCopy = () => {
         navigator.clipboard.writeText(shareUrl);
-        if (onNavigate) onNavigate('feed'); // Reset view or just toast
-        // We'll rely on the parent to show toast if we pass it up, 
-        // but for now let's assume Sidebar styles handles some feedback or we just copy.
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleRegenClick = async () => {
+        setIsSpinning(true);
+        if (onRegenerate) await onRegenerate();
+        setTimeout(() => setIsSpinning(false), 600);
     };
 
     return (
@@ -36,8 +45,8 @@ export default function Sidebar({ user, activity, unreadCount, currentView, onNa
             <div className={`glass ${styles.profileCard}`}>
                 <div className={styles.avatarWrapper}>
                     <img src={user.anonAvatar} alt="avatar" className={styles.avatar} />
-                    <button type="button" onClick={onRegenerate} className={styles.cycleBtn} title="Regenerate Identity">
-                        <RefreshCw size={14} strokeWidth={3} />
+                    <button type="button" onClick={handleRegenClick} className={styles.cycleBtn} title="Regenerate Identity">
+                        <RefreshCw size={14} strokeWidth={3} style={{ animation: isSpinning ? 'spin 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none' }} />
                     </button>
                 </div>
                 <div className={styles.info}>
@@ -52,7 +61,7 @@ export default function Sidebar({ user, activity, unreadCount, currentView, onNa
                     <div className={styles.copyGroup}>
                         <input readOnly value={shareUrl} className={styles.shareInput} />
                         <button onClick={handleCopy} className={styles.copyBtn} style={{display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center'}}>
-                            <Copy size={14} /> Copy
+                            {copied ? <><Check size={14} color="#4ade80" /> Copied!</> : <><Copy size={14} /> Copy</>}
                         </button>
                     </div>
                 </div>

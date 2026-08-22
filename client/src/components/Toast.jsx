@@ -58,6 +58,7 @@ function ToastItem({ toast, remove }) {
         >
             <span className="toast-icon">{ICONS[type] || ICONS.default}</span>
             <span className="toast-message">{toast.message}</span>
+            <div className="toast-progress" />
         </div>
     );
 }
