@@ -1,0 +1,7 @@
+Error: Download failed for url "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-8.2.6.zip", Details:
+ENOSPC: no space left on device, write
+    at WriteStream.<anonymous> (C:\Users\Aditya Kumar Singh\OneDrive\Desktop\nodejspractice\Basics\1NodeExamPrep\5Express\confessit\server\node_modules\mongodb-memory-server-core\lib\util\MongoBinaryDownload.js:402:28)
+    at WriteStream.emit (node:events:520:35)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)

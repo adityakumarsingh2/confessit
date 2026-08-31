@@ -1,0 +1,91 @@
+  console.log
+    [dotenv@17.3.1] injecting env (7) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+  console.log
+    [dotenv@17.3.1] injecting env (7) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+  console.log
+    [dotenv@17.3.1] injecting env (7) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+  console.log
+     [DEBUG] Passport Google Strategy Init
+
+      at Object.log (config/passport.js:20:9)
+
+  console.log
+     [DEBUG] Passport Google Strategy Init
+
+      at Object.log (config/passport.js:20:9)
+
+  console.log
+     [DEBUG] Passport Google Strategy Init
+
+      at Object.log (config/passport.js:20:9)
+
+  console.log
+     [DEBUG] GOOGLE_CLIENT_ID: Present
+
+      at Object.log (config/passport.js:21:9)
+
+  console.log
+     [DEBUG] GOOGLE_CLIENT_ID: Present
+
+      at Object.log (config/passport.js:21:9)
+
+  console.log
+     [DEBUG] GOOGLE_CLIENT_ID: Present
+
+      at Object.log (config/passport.js:21:9)
+
+  console.log
+     [DEBUG] CALLBACK_URL: http://localhost:5173/auth/google/callback
+
+      at Object.log (config/passport.js:22:9)
+
+  console.log
+     [DEBUG] CALLBACK_URL: http://localhost:5173/auth/google/callback
+
+      at Object.log (config/passport.js:22:9)
+
+  console.log
+     [DEBUG] CALLBACK_URL: http://localhost:5173/auth/google/callback
+
+      at Object.log (config/passport.js:22:9)
+
+PASS tests/api/stats.test.js (14.794 s)
+  System & Stats API Automation Tests
+    GET /api/ping
+      √ should respond with health check status 200 (71 ms)
+    GET /api/stats
+      √ should aggregate correct count of confessions, comments, and users (10 ms)
+      √ should handle database errors gracefully with 500 status (6 ms)
+
+PASS tests/api/confessions.test.js (14.798 s)
+  Confessions API Automation Tests
+    GET /api/confessions
+      √ should return empty list when no confessions exist (69 ms)
+      √ should filter public confessions by search term and mood (8 ms)
+    GET /api/confessions/:id
+      √ should return 404 for non-existent confession ID (7 ms)
+      √ should fetch a valid confession by ID (5 ms)
+
+PASS tests/api/private_messages.test.js (14.968 s)
+  Private Messages & User Profiles API Automation Tests
+    GET /api/users/:id
+      √ should return 404 for invalid user ID (69 ms)
+      √ should return user public profile and increment visit count (8 ms)
+    POST /api/confessions/private
+      √ should allow sending an anonymous private message to a recipient (183 ms)
+
+Test Suites: 3 passed, 3 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        18.357 s, estimated 33 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?
