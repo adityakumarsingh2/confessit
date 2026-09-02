@@ -639,7 +639,7 @@ export default function LandingPage({ onExplore }) {
     }, []);
 
     return (
-        <div className={styles.page}>
+        <div className={styles.page} data-landing-theme={landingTheme}>
 
             {/* Grain overlay */}
             <div className={styles.grain} aria-hidden="true" />

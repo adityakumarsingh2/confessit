@@ -6,13 +6,14 @@
 /* ── Base ── */
 .page {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #080808;
-    color: #f0ede8;
+    background: var(--bg-dark);
+    color: var(--text);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: geometricPrecision;
     cursor: none;
+    transition: background 0.4s ease, color 0.4s ease;
 }
 
 /* Cinematic grain overlay */
@@ -185,10 +186,11 @@
     inset: 0;
     pointer-events: none;
     background:
-        radial-gradient(ellipse 70% 65% at 15% 75%, rgba(210, 75, 20, 0.1) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 45% at 80% 30%, rgba(230, 110, 30, 0.07) 0%, transparent 55%),
-        radial-gradient(ellipse 35% 30% at 50% 50%, rgba(150, 40, 10, 0.05) 0%, transparent 50%);
+        radial-gradient(ellipse 70% 65% at 15% 75%, var(--theme-glow) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 45% at 80% 30%, var(--theme-glow) 0%, transparent 55%),
+        radial-gradient(ellipse 35% 30% at 50% 50%, var(--border-glow) 0%, transparent 50%);
     animation: glowBreathe 9s ease-in-out infinite alternate;
+    transition: background 0.5s ease;
 }
 
 @keyframes glowBreathe {
