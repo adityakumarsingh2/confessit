@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
     Heart, Flame, Brain, GraduationCap, Users, Briefcase, NotebookPen, Home,
     ShieldCheck, Shuffle, Trash2, EyeOff,
@@ -500,11 +500,110 @@ function usePageAnimations(pageLoaded) {
 }
 
 /* ─── Main Page ─── */
+const THEMES = [
+    { id: 'ember', label: 'Ember', icon: '🌋' },
+    { id: 'neon', label: 'Neon', icon: '⚡' },
+    { id: 'aurora', label: 'Aurora', icon: '🌌' },
+    { id: 'velvet', label: 'Velvet', icon: '👑' }
+];
+
+const PROMPT_SPARKS = [
+    { cat: 'Crush', text: "What is something you wish you had said to your crush before they moved away?" },
+    { cat: 'Crush', text: "I've been secretly in love with my best friend's sibling for over two years." },
+    { cat: 'Career', text: "What is a major work mistake you covered up that nobody ever found out about?" },
+    { cat: 'Career', text: "I actually automated 80% of my job responsibilities and haven't told my boss." },
+    { cat: 'College', text: "I failed two classes in freshman year and told my parents I got straight A's." },
+    { cat: 'College', text: "I still remember the person who sat next to me in lecture every Tuesday." },
+    { cat: 'Late Night', text: "What thought keeps you awake at 2:00 AM that you'd never post on social media?" },
+    { cat: 'Late Night', text: "I pretend to be completely independent, but some days I just want someone to listen." },
+    { cat: 'Secrets', text: "What is a secret talent or hobby you practice in private because you fear judgment?" },
+    { cat: 'Secrets', text: "I lied about my background to fit in with a group of friends, and now it's too late to confess." }
+];
+
+const MOOD_METER_DATA = [
+    { mood: 'All', label: 'All Vibrations', icon: '🌟', percent: 100, desc: 'Showing all live public confessions', count: '12,400+ secrets' },
+    { mood: 'Relationship', label: 'Crush & Relationships', icon: '💘', percent: 34, desc: 'Unspoken crushes & romantic feelings', count: '4,280 secrets' },
+    { mood: 'NGL', label: 'Hot Takes & NGL', icon: '🔥', percent: 28, desc: 'Brutally honest hot takes & NGL truths', count: '3,520 secrets' },
+    { mood: 'Mental Health', label: 'Mental Health', icon: '🧠', percent: 22, desc: 'Quiet struggles, anxiety & healing', count: '2,760 secrets' },
+    { mood: 'College', label: 'College & Career', icon: '🎓', percent: 16, desc: 'Campus secrets & office confessions', count: '2,010 secrets' }
+];
+
 export default function LandingPage({ onExplore }) {
     const [loaded, setLoaded] = useState(false);
     const [stats, setStats] = useState({ confessions: 0, comments: 0, users: 0 });
     const handleDone = useCallback(() => setLoaded(true), []);
     const doubled = [...WALL_CONFESSIONS, ...WALL_CONFESSIONS];
+
+    /* ── State Hooks for Widgets & Themes ── */
+    const [landingTheme, setLandingTheme] = useState(() => localStorage.getItem('confess_landing_theme') || 'ember');
+    const [promptCat, setPromptCat] = useState('All');
+    const [promptIndex, setPromptIndex] = useState(0);
+    const [isShufflingPrompt, setIsShufflingPrompt] = useState(false);
+    const [activeMoodFilter, setActiveMoodFilter] = useState('All');
+    const [reactionCounts, setReactionCounts] = useState({ '❤️': 42, '🔥': 28, '😮': 19, '😢': 15, '😂': 31, '✨': 24 });
+    const [floatingBursts, setFloatingBursts] = useState([]);
+    const [privacySeed, setPrivacySeed] = useState('7f9a2b0c-4e81');
+    const [isRegeneratingSeed, setIsRegeneratingSeed] = useState(false);
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-landing-theme', landingTheme);
+        localStorage.setItem('confess_landing_theme', landingTheme);
+    }, [landingTheme]);
+
+    const filteredPrompts = useMemo(() => {
+        if (promptCat === 'All') return PROMPT_SPARKS;
+        return PROMPT_SPARKS.filter(p => p.cat === promptCat);
+    }, [promptCat]);
+
+    const currentPrompt = filteredPrompts[promptIndex % filteredPrompts.length] || PROMPT_SPARKS[0];
+
+    const handleShufflePrompt = () => {
+        setIsShufflingPrompt(true);
+        setTimeout(() => {
+            setPromptIndex(prev => prev + 1);
+            setIsShufflingPrompt(false);
+        }, 220);
+    };
+
+    const handleUsePromptInHero = (text) => {
+        document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+            const area = document.querySelector(`.${styles.composerArea}`);
+            if (area) {
+                area.focus();
+                area.value = text;
+                const event = new Event('input', { bubbles: true });
+                area.dispatchEvent(event);
+            }
+        }, 500);
+    };
+
+    const handleTriggerBurst = (emoji) => {
+        setReactionCounts(prev => ({ ...prev, [emoji]: (prev[emoji] || 0) + 1 }));
+        const id = Date.now() + Math.random();
+        const dx = `${(Math.random() * 140 - 70).toFixed(0)}px`;
+        const dy = `-${(Math.random() * 90 + 40).toFixed(0)}px`;
+        setFloatingBursts(prev => [...prev, { id, emoji, dx, dy }]);
+        setTimeout(() => {
+            setFloatingBursts(prev => prev.filter(b => b.id !== id));
+        }, 880);
+    };
+
+    const handleRegenerateSeed = () => {
+        setIsRegeneratingSeed(true);
+        setTimeout(() => {
+            setPrivacySeed(Math.random().toString(36).substring(2, 10) + '-' + Math.random().toString(36).substring(2, 6));
+            setIsRegeneratingSeed(false);
+        }, 300);
+    };
+
+    const filteredWallConfessions = useMemo(() => {
+        if (activeMoodFilter === 'All') return doubled;
+        return doubled.filter(c => {
+            if (activeMoodFilter === 'College') return c.mood === 'College' || c.mood === 'Career' || c.mood === 'Study';
+            return c.mood === activeMoodFilter;
+        });
+    }, [doubled, activeMoodFilter]);
 
     useEffect(() => {
         fetch(`${API_URL}/api/stats`)
@@ -567,6 +666,20 @@ export default function LandingPage({ onExplore }) {
                     ConfessHere
                 </span>
                 <div className={styles.navRight}>
+                    {/* Theme Atmosphere Selector */}
+                    <div className={styles.themeBar} title="Switch Atmosphere Theme">
+                        {THEMES.map(t => (
+                            <button
+                                key={t.id}
+                                className={`${styles.themePill} ${landingTheme === t.id ? styles.themePillActive : ''}`}
+                                onClick={() => setLandingTheme(t.id)}
+                            >
+                                <span>{t.icon}</span>
+                                <span>{t.label}</span>
+                            </button>
+                        ))}
+                    </div>
+
                     <button
                         onClick={onExplore}
                         className={styles.navMuted}
@@ -681,25 +794,201 @@ export default function LandingPage({ onExplore }) {
                 </div>
             </section>
 
-            {/* ─── CONFESSION WALL ─── */}
+            {/* ─── WIDGET 1: PROMPT SPARK / SECRET GENERATOR ─── */}
+            <section className={styles.widgetSection} id="prompt-spark">
+                <div className={styles.widgetHeader} data-reveal>
+                    <div className={styles.widgetBadge}>✨ Prompt Spark Generator</div>
+                    <h2 className={styles.widgetTitle}>Not sure what to confess?</h2>
+                    <p className={styles.widgetSub}>
+                        Generate thought-provoking prompts and inspiration for your next secret.
+                    </p>
+                </div>
+
+                <div className={styles.promptCardBox} data-reveal>
+                    <div className={styles.promptCategoryRow}>
+                        {['All', 'Crush', 'Career', 'College', 'Late Night', 'Secrets'].map(cat => (
+                            <button
+                                key={cat}
+                                className={`${styles.promptCatChip} ${promptCat === cat ? styles.promptCatChipActive : ''}`}
+                                onClick={() => { setPromptCat(cat); setPromptIndex(0); }}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className={styles.promptContentDisplay} style={{ opacity: isShufflingPrompt ? 0.3 : 1 }}>
+                        "{currentPrompt.text}"
+                    </div>
+
+                    <div className={styles.promptActions}>
+                        <button
+                            className={styles.promptShuffleBtn}
+                            onClick={handleShufflePrompt}
+                            data-magnetic
+                        >
+                            <Shuffle size={16} />
+                            Shuffle Inspiration
+                        </button>
+
+                        <button
+                            className={styles.promptUseBtn}
+                            onClick={() => handleUsePromptInHero(currentPrompt.text)}
+                            data-magnetic
+                        >
+                            Use this prompt in Composer
+                            <ArrowRight size={16} />
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── WIDGET 2: COMMUNITY MOOD METER & LIVE WALL ─── */}
+            <section className={styles.widgetSection} id="mood-meter">
+                <div className={styles.widgetHeader} data-reveal>
+                    <div className={styles.widgetBadge}>📊 Community Pulse & Mood Meter</div>
+                    <h2 className={styles.widgetTitle}>How the community is feeling</h2>
+                    <p className={styles.widgetSub}>
+                        Click any mood filter below to spotlight matching secrets on the live wall.
+                    </p>
+                </div>
+
+                <div className={styles.moodGrid} data-reveal>
+                    {MOOD_METER_DATA.map((item) => (
+                        <div
+                            key={item.mood}
+                            className={`${styles.moodCard} ${activeMoodFilter === item.mood ? styles.moodCardActive : ''}`}
+                            onClick={() => setActiveMoodFilter(item.mood)}
+                        >
+                            <div className={styles.moodTop}>
+                                <div className={styles.moodIconLabel}>
+                                    <span>{item.icon}</span>
+                                    <span>{item.label}</span>
+                                </div>
+                                <span className={styles.moodPercent}>{item.percent}%</span>
+                            </div>
+                            <div className={styles.moodBarTrack}>
+                                <div className={styles.moodBarFill} style={{ width: `${item.percent}%` }} />
+                            </div>
+                            <p className={styles.moodDesc}>{item.desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* ─── CONFESSION WALL (FILTERED BY MOOD METER) ─── */}
             <section className={styles.wall}>
                 <div className={styles.wallHeader} data-reveal>
                     <div className={styles.wallHeaderLeft}>
                         <span className={styles.wallTag}>
                             <span className={styles.wallTagDot} />
-                            Live wall
+                            Live wall ({activeMoodFilter})
                         </span>
                         <span className={styles.wallSubLabel}>Scrolls with your scroll velocity</span>
                     </div>
-                    <span className={styles.wallNote}>Representative examples — real posts look exactly like these</span>
+                    <span className={styles.wallNote}>Filtered by active community mood</span>
                 </div>
                 <div className={styles.wallScroll}>
                     <div className={styles.wallTrack} id="ch-wall-track">
-                        {doubled.map((c, i) => <WallCard key={`${c._id}-${i}`} confession={c} />)}
+                        {filteredWallConfessions.map((c, i) => <WallCard key={`${c._id}-${i}`} confession={c} />)}
                     </div>
                 </div>
                 <div className={styles.wallFadeLeft} aria-hidden="true" />
                 <div className={styles.wallFadeRight} aria-hidden="true" />
+            </section>
+
+            {/* ─── WIDGET 3: LIVE REACTION SIMULATOR PLAYGROUND ─── */}
+            <section className={styles.widgetSection} id="reaction-playground">
+                <div className={styles.widgetHeader} data-reveal>
+                    <div className={styles.widgetBadge}>💥 Interactive Physics</div>
+                    <h2 className={styles.widgetTitle}>Test Live Reaction Physics</h2>
+                    <p className={styles.widgetSub}>
+                        Click emojis to send multi-directional floating particle bursts!
+                    </p>
+                </div>
+
+                <div className={styles.reactionStageCard} data-reveal>
+                    <div className={styles.reactionBurstBox}>
+                        <p className={styles.reactionDemoText}>
+                            "I secretly helped an anonymous student pass their final exam by leaving study notes under their desk."
+                        </p>
+                        {floatingBursts.map(b => (
+                            <span
+                                key={b.id}
+                                className={styles.floatingBurstItem}
+                                style={{ '--burst-dx': b.dx, '--burst-dy': b.dy }}
+                            >
+                                {b.emoji}
+                            </span>
+                        ))}
+                    </div>
+
+                    <div className={styles.reactionButtonRow}>
+                        {Object.entries(reactionCounts).map(([emoji, count]) => (
+                            <button
+                                key={emoji}
+                                className={styles.reactionPillBtn}
+                                onClick={() => handleTriggerBurst(emoji)}
+                                data-magnetic
+                            >
+                                <span>{emoji}</span>
+                                <span>{count}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── WIDGET 4: ANONYMITY INSPECTOR SIMULATOR ─── */}
+            <section className={styles.widgetSection} id="anonymity-inspector">
+                <div className={styles.widgetHeader} data-reveal>
+                    <div className={styles.widgetBadge}>🛡️ Privacy Engine Inspector</div>
+                    <h2 className={styles.widgetTitle}>How zero-trace protection works</h2>
+                    <p className={styles.widgetSub}>
+                        See how your raw input is stripped of metadata and encrypted before public release.
+                    </p>
+                </div>
+
+                <div className={styles.privacyGrid} data-reveal>
+                    <div className={styles.privacyStepCard}>
+                        <span className={styles.privacyStepNum}>01. Raw Input</span>
+                        <h3 className={styles.privacyStepTitle}>Your Private Thought</h3>
+                        <div className={styles.privacyCodeBox}>
+                            Text: "I'm secretly writing music late at night."<br />
+                            Browser: Chrome / Windows<br />
+                            User Session: Active
+                        </div>
+                        <span className={styles.privacyStatusBadge}>Step 1 Complete</span>
+                    </div>
+
+                    <div className={styles.privacyStepCard}>
+                        <span className={styles.privacyStepNum}>02. Privacy Shield</span>
+                        <h3 className={styles.privacyStepTitle}>Zero-Trace Encryption</h3>
+                        <div className={styles.privacyCodeBox}>
+                            AES Salt: {privacySeed}<br />
+                            IP Mask: 192.168.0.x ➔ [ERASED]<br />
+                            Persona Hash: Anon-{privacySeed.slice(0,6)}
+                        </div>
+                        <button
+                            className={styles.promptShuffleBtn}
+                            onClick={handleRegenerateSeed}
+                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', marginTop: 'auto' }}
+                        >
+                            {isRegeneratingSeed ? 'Hashing...' : 'Regenerate Seed'}
+                        </button>
+                    </div>
+
+                    <div className={styles.privacyStepCard}>
+                        <span className={styles.privacyStepNum}>03. Public Wall</span>
+                        <h3 className={styles.privacyStepTitle}>Untraceable Persona</h3>
+                        <div className={styles.privacyCodeBox}>
+                            Display Name: "Melodic Ghost"<br />
+                            Avatar: Random Seed SVG<br />
+                            Account Connection: NONE
+                        </div>
+                        <span className={styles.privacyStatusBadge}>100% Untraceable</span>
+                    </div>
+                </div>
             </section>
 
             {/* ─── EDITORIAL — "Why anonymity?" ─── */}
@@ -712,6 +1001,7 @@ export default function LandingPage({ onExplore }) {
                     </p>
                 </div>
             </section>
+
 
             {/* ─── CATEGORIES ─── */}
             <section className={styles.categories}>
