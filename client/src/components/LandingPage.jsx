@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
     Heart, Flame, Brain, GraduationCap, Users, Briefcase, NotebookPen, Home,
-    ShieldCheck, Shuffle, Trash2, EyeOff,
-    ArrowRight, Lock, ChevronRight,
+    ShieldCheck, Shuffle, Trash2, EyeOff, Volume2, VolumeX, Sparkles, HelpCircle,
+    ArrowRight, Lock, ChevronRight, ChevronDown, Bookmark, Send,
 } from 'lucide-react';
 import styles from './LandingPage.module.css';
 import './LandingPage.animations.css';
@@ -528,14 +528,127 @@ const MOOD_METER_DATA = [
     { mood: 'College', label: 'College & Career', icon: '🎓', percent: 16, desc: 'Campus secrets & office confessions', count: '2,010 secrets' }
 ];
 
+const PII_DEFAULT_TEXT = "My name is Sarah Connor and I live at 742 Evergreen Terrace in Seattle. Call me at 555-0199 or email sarah@example.com.";
+
+const scrubPIIText = (text) => {
+    let result = text;
+    result = result.replace(/(Sarah Connor|Alex Miller|David Vance)/gi, '[NAME MASKED]');
+    result = result.replace(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, '[PHONE REDACTED]');
+    result = result.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL REDACTED]');
+    result = result.replace(/\b(Seattle|Chicago|New York City|Evergreen Terrace)\b/gi, '[LOCATION ERASED]');
+    return result;
+};
+
+const HALL_OF_FAME_SECRETS = [
+    {
+        _id: 'hof1',
+        title: "The Unspoken Legacy",
+        text: "I secretly pay off one random student's library fines every semester. I remember how it felt to lose book privileges in freshman year.",
+        author: "Anonymous Philanthropist",
+        relates: 482,
+        bookmarks: 194,
+        tag: "#Kindness",
+        badge: "👑 Top Secret of the Month"
+    },
+    {
+        _id: 'hof2',
+        title: "The Midnight Code",
+        text: "I built an anonymous mental health chatbot for my university campus during exam week. 1,200 students used it before graduation.",
+        author: "Quiet Developer",
+        relates: 395,
+        bookmarks: 142,
+        tag: "#CampusSecrets",
+        badge: "🔥 Most Relatable"
+    },
+    {
+        _id: 'hof3',
+        title: "The 3:00 AM Promise",
+        text: "I promised myself five years ago that I would write one page of my novel every single night, no matter how tired I was. Tonight I finished line 100,000.",
+        author: "Nighttime Writer",
+        relates: 512,
+        bookmarks: 230,
+        tag: "#LateNightThoughts",
+        badge: "✨ Most Inspiring"
+    }
+];
+
+const FAQ_DATA = [
+    {
+        q: "Is ConfessHere truly 100% anonymous?",
+        a: "Yes. We do not store IP addresses, device identifiers, or browser fingerprints. All confessions are assigned a zero-trace random persona seed before saving to our encrypted database."
+    },
+    {
+        q: "Do I need an account to write or browse secrets?",
+        a: "Not at all! Anyone can browse, generate prompt inspirations, test the privacy inspector, or post a confession freely without registering."
+    },
+    {
+        q: "How does the zero-trace privacy scrubber work?",
+        a: "Our client-side security layer automatically masks names, locations, phone numbers, and emails before your secret reaches the public feed."
+    },
+    {
+        q: "Can my confession be linked back to my Google account?",
+        a: "No. If you choose to log in to save bookmarks or moderate your posts, authentication tokens are completely decoupled from your posted confessions."
+    }
+];
+
 export default function LandingPage({ onExplore }) {
     const [loaded, setLoaded] = useState(false);
     const [stats, setStats] = useState({ confessions: 0, comments: 0, users: 0 });
     const handleDone = useCallback(() => setLoaded(true), []);
     const doubled = [...WALL_CONFESSIONS, ...WALL_CONFESSIONS];
 
-    /* ── State Hooks for Widgets & Themes ── */
+    /* ── State Hooks for Density Widgets & Themes ── */
     const [landingTheme, setLandingTheme] = useState(() => localStorage.getItem('confess_landing_theme') || 'ember');
+    const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+    const audioCtxRef = useRef(null);
+
+    const toggleAudioSynthesizer = () => {
+        if (isAudioPlaying) {
+            if (audioCtxRef.current) audioCtxRef.current.suspend();
+            setIsAudioPlaying(false);
+        } else {
+            if (!audioCtxRef.current) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) {
+                    const ctx = new AudioCtx();
+                    audioCtxRef.current = ctx;
+                    const bufferSize = ctx.sampleRate * 2;
+                    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    let b0=0, b1=0, b2=0, b3=0, b4=0;
+                    for (let i = 0; i < bufferSize; i++) {
+                        const white = Math.random() * 2 - 1;
+                        b0 = 0.99 * b0 + white * 0.05;
+                        b1 = 0.95 * b1 + white * 0.08;
+                        b2 = 0.90 * b2 + white * 0.12;
+                        data[i] = (b0 + b1 + b2) * 0.03;
+                    }
+                    const noise = ctx.createBufferSource();
+                    noise.buffer = buffer;
+                    noise.loop = true;
+                    const filter = ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 600;
+                    const gain = ctx.createGain();
+                    gain.gain.value = 0.1;
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(ctx.destination);
+                    noise.start();
+                }
+            } else {
+                audioCtxRef.current.resume();
+            }
+            setIsAudioPlaying(true);
+        }
+    };
+
+    const [scrubberText, setScrubberText] = useState(PII_DEFAULT_TEXT);
+    const [etherText, setEtherText] = useState('');
+    const [isReleasingEther, setIsReleasingEther] = useState(false);
+    const [releasedEmbers, setReleasedEmbers] = useState([]);
+    const [openFaqIndex, setOpenFaqIndex] = useState(0);
+
     const [promptCat, setPromptCat] = useState('All');
     const [promptIndex, setPromptIndex] = useState(0);
     const [isShufflingPrompt, setIsShufflingPrompt] = useState(false);
@@ -544,6 +657,23 @@ export default function LandingPage({ onExplore }) {
     const [floatingBursts, setFloatingBursts] = useState([]);
     const [privacySeed, setPrivacySeed] = useState('7f9a2b0c-4e81');
     const [isRegeneratingSeed, setIsRegeneratingSeed] = useState(false);
+
+    const handleReleaseToEther = () => {
+        if (!etherText.trim() || isReleasingEther) return;
+        setIsReleasingEther(true);
+        const embers = Array.from({ length: 14 }).map((_, i) => ({
+            id: Date.now() + i,
+            left: `${(Math.random() * 80 + 10).toFixed(0)}%`,
+            top: `${(Math.random() * 50 + 20).toFixed(0)}%`,
+            size: `${(Math.random() * 10 + 6).toFixed(0)}px`
+        }));
+        setReleasedEmbers(embers);
+        setTimeout(() => {
+            setEtherText('');
+            setIsReleasingEther(false);
+            setReleasedEmbers([]);
+        }, 1600);
+    };
 
     useEffect(() => {
         document.documentElement.setAttribute('data-landing-theme', landingTheme);
@@ -666,6 +796,16 @@ export default function LandingPage({ onExplore }) {
                     ConfessHere
                 </span>
                 <div className={styles.navRight}>
+                    {/* Ambient Audio Synthesizer Button */}
+                    <button
+                        className={`${styles.audioBtn} ${isAudioPlaying ? styles.audioBtnActive : ''}`}
+                        onClick={toggleAudioSynthesizer}
+                        title={isAudioPlaying ? "Mute Ambient Soundscape" : "Play Rain Soundscape"}
+                    >
+                        {isAudioPlaying ? <Volume2 size={13} /> : <VolumeX size={13} />}
+                        <span>{isAudioPlaying ? 'Rain Ambient ON' : 'Rain Ambient'}</span>
+                    </button>
+
                     {/* Theme Atmosphere Selector */}
                     <div className={styles.themeBar} title="Switch Atmosphere Theme">
                         {THEMES.map(t => (
@@ -745,6 +885,20 @@ export default function LandingPage({ onExplore }) {
                                 Explore Feed
                                 <ChevronRight size={16} />
                             </button>
+                        </div>
+
+                        {/* Trending Hero Hashtag Pills */}
+                        <div className={styles.heroHashtagRow} data-reveal data-reveal-delay="3">
+                            <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', fontWeight: 600 }}>Trending:</span>
+                            {['#LateNightThoughts', '#CrushConfessions', '#CampusSecrets', '#WorkRant', '#HealingOutLoud'].map(tag => (
+                                <button
+                                    key={tag}
+                                    className={styles.heroHashtagPill}
+                                    onClick={() => handleUsePromptInHero(`Sharing a thought on ${tag}: `)}
+                                >
+                                    {tag}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
@@ -988,6 +1142,149 @@ export default function LandingPage({ onExplore }) {
                         </div>
                         <span className={styles.privacyStatusBadge}>100% Untraceable</span>
                     </div>
+                </div>
+            </section>
+
+            {/* ─── WIDGET 5: PII PRIVACY SCRUBBER PLAYGROUND ─── */}
+            <section className={styles.widgetSection} id="pii-scrubber">
+                <div className={styles.widgetHeader} data-reveal>
+                    <div className={styles.widgetBadge}>🔒 Real-time PII Protection</div>
+                    <h2 className={styles.widgetTitle}>Test the Live Privacy Scrubber</h2>
+                    <p className={styles.widgetSub}>
+                        Type or edit text below to test how personal names, emails, phone numbers, and locations are scrubbed automatically before publishing.
+                    </p>
+                </div>
+
+                <div className={styles.scrubberCard} data-reveal>
+                    <div className={styles.scrubberCol}>
+                        <span className={styles.scrubberLabel}>Your Draft Input:</span>
+                        <textarea
+                            className={styles.scrubberTextarea}
+                            value={scrubberText}
+                            onChange={(e) => setScrubberText(e.target.value)}
+                            placeholder="Type a draft confession with names or emails..."
+                        />
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>
+                            Try typing: "My name is Sarah Connor and I live in Seattle."
+                        </span>
+                    </div>
+
+                    <div className={styles.scrubberCol}>
+                        <span className={styles.scrubberLabel}>Masked Zero-Trace Output:</span>
+                        <div className={styles.scrubberResultBox}>
+                            {scrubPIIText(scrubberText) || 'Scratching out sensitive details...'}
+                        </div>
+                        <span className={styles.privacyStatusBadge}>
+                            <ShieldCheck size={12} /> Auto-Scrubbing Active
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── WIDGET 6: RELEASE TO ETHER SECRET RITUAL ─── */}
+            <section className={styles.widgetSection} id="release-ether">
+                <div className={styles.etherCard} data-reveal>
+                    <div className={styles.widgetBadge} style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>
+                        🔥 Secret Release Ritual
+                    </div>
+                    <h2 className={styles.widgetTitle} style={{ marginTop: '0.5rem' }}>Release Your Burden to the Ether</h2>
+                    <p className={styles.widgetSub} style={{ margin: '0 auto', maxWidth: 520 }}>
+                        Got something heavy on your chest you don't even want saved? Write it here and watch it dissolve into glowing embers without leaving a trace.
+                    </p>
+
+                    <div style={{ position: 'relative', width: '100%' }}>
+                        <textarea
+                            className={styles.etherTextarea}
+                            value={etherText}
+                            onChange={(e) => setEtherText(e.target.value)}
+                            placeholder="Type a heavy thought or regret to release..."
+                            disabled={isReleasingEther}
+                        />
+
+                        {releasedEmbers.map(e => (
+                            <span
+                                key={e.id}
+                                className={styles.etherEmberParticle}
+                                style={{ left: e.left, top: e.top, width: e.size, height: e.size }}
+                            />
+                        ))}
+                    </div>
+
+                    <button
+                        className={styles.etherBurnBtn}
+                        onClick={handleReleaseToEther}
+                        disabled={!etherText.trim() || isReleasingEther}
+                        data-magnetic
+                    >
+                        <Sparkles size={16} />
+                        {isReleasingEther ? 'Dissolving into Embers...' : 'Release to Ether'}
+                    </button>
+                </div>
+            </section>
+
+            {/* ─── SECTION: HALL OF FAME TOP SECRETS SHOWCASE ─── */}
+            <section className={styles.widgetSection} id="hall-of-fame">
+                <div className={styles.widgetHeader} data-reveal>
+                    <div className={styles.widgetBadge}>🏆 Community Spotlight</div>
+                    <h2 className={styles.widgetTitle}>Confession Hall of Fame</h2>
+                    <p className={styles.widgetSub}>
+                        The most inspiring, relatable, and remarkable anonymous confessions shared this month.
+                    </p>
+                </div>
+
+                <div className={styles.hofGrid} data-reveal>
+                    {HALL_OF_FAME_SECRETS.map((item) => (
+                        <div key={item._id} className={styles.hofCard}>
+                            <div>
+                                <span className={styles.hofBadge}>{item.badge}</span>
+                                <h3 className={styles.hofTitle}>{item.title}</h3>
+                                <p className={styles.hofText}>"{item.text}"</p>
+                            </div>
+                            <div className={styles.hofFooter}>
+                                <span>{item.author} · {item.tag}</span>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <Heart size={12} fill="var(--danger)" color="var(--danger)" /> {item.relates}
+                                    <Bookmark size={12} style={{ marginLeft: 6 }} /> {item.bookmarks}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* ─── SECTION: FAQ ACCORDION ─── */}
+            <section className={styles.widgetSection} id="faq-section">
+                <div className={styles.widgetHeader} data-reveal>
+                    <div className={styles.widgetBadge}>❓ Truth & Clarity</div>
+                    <h2 className={styles.widgetTitle}>Frequently Asked Questions</h2>
+                    <p className={styles.widgetSub}>
+                        Everything you need to know about our privacy architecture, safety, and community guidelines.
+                    </p>
+                </div>
+
+                <div className={styles.faqBox} data-reveal>
+                    {FAQ_DATA.map((item, idx) => {
+                        const isOpen = openFaqIndex === idx;
+                        return (
+                            <div key={idx} className={`${styles.faqItem} ${isOpen ? styles.faqItemOpen : ''}`}>
+                                <button
+                                    className={styles.faqQuestionBtn}
+                                    onClick={() => setOpenFaqIndex(isOpen ? -1 : idx)}
+                                >
+                                    <span>{item.q}</span>
+                                    <ChevronDown
+                                        size={18}
+                                        style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.25s' }}
+                                    />
+                                </button>
+                                {isOpen && (
+                                    <div className={styles.faqAnswerBody}>
+                                        {item.a}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </section>
 
