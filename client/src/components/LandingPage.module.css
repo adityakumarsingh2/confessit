@@ -1500,7 +1500,9 @@
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 800;
     letter-spacing: -0.04em;
-    color: var(--text);
+    background: linear-gradient(135deg, #ffffff 30%, var(--primary-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin-bottom: 0.75rem;
 }
 

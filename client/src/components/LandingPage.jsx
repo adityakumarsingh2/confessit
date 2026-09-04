@@ -848,8 +848,8 @@ export default function LandingPage({ onExplore }) {
                     {/* Left — headline + sub + badge */}
                     <div className={styles.heroLeft} data-shear>
                         <div className={styles.heroBadge} data-reveal>
-                            <span className={styles.heroBadgeDot} />
-                            100% anonymous · No account to read
+                            <span className={styles.heroBadgeDot} style={{ background: '#22c55e', boxShadow: '0 0 10px #22c55e' }} />
+                            🟢 2,491 Online Now · 100% Anonymous & Zero-Trace
                         </div>
 
                         <div className={styles.heroHeadlineWrap}>
